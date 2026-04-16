@@ -1,0 +1,590 @@
+[
+  {
+    "path": "Fig1.pdf",
+    "file_type": ".pdf",
+    "semantics": "paper figure output",
+    "fields": {}
+  },
+  {
+    "path": "Fig2.pdf",
+    "file_type": ".pdf",
+    "semantics": "paper figure output",
+    "fields": {}
+  },
+  {
+    "path": "Fig4.pdf",
+    "file_type": ".pdf",
+    "semantics": "paper figure output",
+    "fields": {}
+  },
+  {
+    "path": "Fig5.pdf",
+    "file_type": ".pdf",
+    "semantics": "paper figure output",
+    "fields": {}
+  },
+  {
+    "path": "Fig6.pdf",
+    "file_type": ".pdf",
+    "semantics": "paper figure output",
+    "fields": {}
+  },
+  {
+    "path": "H4band.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "Mu2.npy",
+    "file_type": ".npy",
+    "semantics": "auxiliary chemical-potential baseline table",
+    "fields": {
+      "array": {
+        "shape": [
+          4,
+          4
+        ],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "README.md",
+    "file_type": ".md",
+    "semantics": "unclassified source artifact",
+    "fields": {}
+  },
+  {
+    "path": "func.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "pams_J0.09_0.18_0_0_0_0_complex_Nm220_-0.3372_0.3_-0.1646_0.3_121_93.npz",
+    "file_type": ".npz",
+    "semantics": "two-parameter px/pz RMFT phase-space scan",
+    "fields": {
+      "Nm": {
+        "shape": [],
+        "dtype": "int64"
+      },
+      "Pms": {
+        "shape": [
+          121,
+          93,
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "pxr": {
+        "shape": [
+          121
+        ],
+        "dtype": "float64"
+      },
+      "eps": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "pzr": {
+        "shape": [
+          93
+        ],
+        "dtype": "float64"
+      },
+      "Mu": {
+        "shape": [
+          121,
+          93,
+          8
+        ],
+        "dtype": "float64"
+      },
+      "N": {
+        "shape": [
+          121,
+          93,
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Js": {
+        "shape": [
+          6
+        ],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pams_fig1_alpha0.671965_J0.09_0.18_0_0_0_0_complex_Nm220_-0.501831_0.6_192.npz",
+    "file_type": ".npz",
+    "semantics": "doping sweep RMFT pairing data",
+    "fields": {
+      "pr": {
+        "shape": [
+          192
+        ],
+        "dtype": "float64"
+      },
+      "Nm": {
+        "shape": [],
+        "dtype": "int64"
+      },
+      "Pms": {
+        "shape": [
+          192,
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "eps": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "Js": {
+        "shape": [
+          6
+        ],
+        "dtype": "float64"
+      },
+      "Mu": {
+        "shape": [
+          192,
+          8
+        ],
+        "dtype": "float64"
+      },
+      "alpha": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "N": {
+        "shape": [
+          192,
+          4
+        ],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pams_figJ_p0_0_complex_Nm220_0_2_96_J3-0.03_JH0.npz",
+    "file_type": ".npz",
+    "semantics": "exchange-coupling sweep RMFT pairing data",
+    "fields": {
+      "Nm": {
+        "shape": [],
+        "dtype": "int64"
+      },
+      "Pms": {
+        "shape": [
+          96,
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "eps": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "Jr": {
+        "shape": [
+          96,
+          6
+        ],
+        "dtype": "float64"
+      },
+      "N": {
+        "shape": [
+          96,
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Mu": {
+        "shape": [
+          96,
+          8
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "int64"
+      },
+      "JH": {
+        "shape": [],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pams_figJ_p0_0_complex_Nm220_0_2_96_JH-1.npz",
+    "file_type": ".npz",
+    "semantics": "exchange-coupling sweep RMFT pairing data",
+    "fields": {
+      "Nm": {
+        "shape": [],
+        "dtype": "int64"
+      },
+      "Pms": {
+        "shape": [
+          96,
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "eps": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "Jr": {
+        "shape": [
+          96,
+          6
+        ],
+        "dtype": "float64"
+      },
+      "N": {
+        "shape": [
+          96,
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Mu": {
+        "shape": [
+          96,
+          8
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "int64"
+      },
+      "JH": {
+        "shape": [],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pams_figJ_p0_0_complex_Nm220_0_2_96_JH0.npz",
+    "file_type": ".npz",
+    "semantics": "exchange-coupling sweep RMFT pairing data",
+    "fields": {
+      "Nm": {
+        "shape": [],
+        "dtype": "int64"
+      },
+      "Pms": {
+        "shape": [
+          96,
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "eps": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "Jr": {
+        "shape": [
+          96,
+          6
+        ],
+        "dtype": "float64"
+      },
+      "N": {
+        "shape": [
+          96,
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Mu": {
+        "shape": [
+          96,
+          8
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "int64"
+      },
+      "JH": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "alpha": {
+        "shape": [],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pams_figT_J0.09_0.18_0_0_0_0_p0_0_complex_T0_0.012_96.npz",
+    "file_type": ".npz",
+    "semantics": "temperature sweep RMFT pairing data",
+    "fields": {
+      "Pms": {
+        "shape": [
+          96,
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "Tr": {
+        "shape": [
+          96
+        ],
+        "dtype": "float64"
+      },
+      "eps": {
+        "shape": [],
+        "dtype": "float64"
+      },
+      "Js": {
+        "shape": [
+          6
+        ],
+        "dtype": "float64"
+      },
+      "Mu": {
+        "shape": [
+          96,
+          8
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      },
+      "N": {
+        "shape": [
+          96,
+          4
+        ],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "plot_Fig1.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "plot_Fig2.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "plot_Fig3.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "plot_Fig4.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "plot_Fig5.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "plot_Fig6.py",
+    "file_type": ".py",
+    "semantics": "source-side plotting or model helper",
+    "fields": {}
+  },
+  {
+    "path": "pms_p-0.15_-0.2_J0.09_0.18_0.npz",
+    "file_type": ".npz",
+    "semantics": "single RMFT sample snapshot",
+    "fields": {
+      "pms": {
+        "shape": [
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "mu": {
+        "shape": [
+          8
+        ],
+        "dtype": "float64"
+      },
+      "n": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Js": {
+        "shape": [
+          6
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pms_p-0.15_0_J0.09_0.18_0.npz",
+    "file_type": ".npz",
+    "semantics": "single RMFT sample snapshot",
+    "fields": {
+      "pms": {
+        "shape": [
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "mu": {
+        "shape": [
+          8
+        ],
+        "dtype": "float64"
+      },
+      "n": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Js": {
+        "shape": [
+          6
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pms_p0_-0.28_J0.09_0.18_0.npz",
+    "file_type": ".npz",
+    "semantics": "single RMFT sample snapshot",
+    "fields": {
+      "pms": {
+        "shape": [
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "mu": {
+        "shape": [
+          8
+        ],
+        "dtype": "float64"
+      },
+      "n": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Js": {
+        "shape": [
+          6
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      }
+    }
+  },
+  {
+    "path": "pms_p0_0_J0.09_0.18_0.npz",
+    "file_type": ".npz",
+    "semantics": "single RMFT sample snapshot",
+    "fields": {
+      "pms": {
+        "shape": [
+          6,
+          4,
+          4
+        ],
+        "dtype": "complex128"
+      },
+      "mu": {
+        "shape": [
+          8
+        ],
+        "dtype": "float64"
+      },
+      "n": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      },
+      "Js": {
+        "shape": [
+          6
+        ],
+        "dtype": "float64"
+      },
+      "p": {
+        "shape": [
+          4
+        ],
+        "dtype": "float64"
+      }
+    }
+  }
+]

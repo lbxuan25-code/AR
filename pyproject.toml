@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rmft-guided-surrogate-ar"
+version = "0.1.0"
+description = "Physics-core-first surrogate workflow for pairing-and-transport AR spectra in Ni327."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "autograd>=1.7",
+  "matplotlib>=3.8",
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "pydantic>=2.8",
+  "scipy>=1.12",
+  "torch>=2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-ra"

@@ -1,0 +1,46 @@
+{
+  "target_index": 1,
+  "candidate_cluster": [
+    {
+      "rank": 1,
+      "surrogate_mse": 0.00213724086044931,
+      "physics_mse": 2.4657031555179298e-05,
+      "barrier_z": 0.3545454442501068,
+      "gamma": 1.1818181276321411,
+      "gauge_index": 1
+    },
+    {
+      "rank": 2,
+      "surrogate_mse": 0.0012139230436217646,
+      "physics_mse": 0.0018809779058066797,
+      "barrier_z": 0.48181816935539246,
+      "gamma": 0.20000000298023224,
+      "gauge_index": 1
+    },
+    {
+      "rank": 3,
+      "surrogate_mse": 0.0019232542093629303,
+      "physics_mse": 0.002038990113798841,
+      "barrier_z": 0.6090909242630005,
+      "gamma": 0.6909090876579285,
+      "gauge_index": 1
+    },
+    {
+      "rank": 4,
+      "surrogate_mse": 0.001838228426886378,
+      "physics_mse": 0.003499622418472758,
+      "barrier_z": 0.18360859155654907,
+      "gamma": 1.3392009735107422,
+      "gauge_index": 1
+    },
+    {
+      "rank": 5,
+      "surrogate_mse": 0.0015429593689755697,
+      "physics_mse": 0.014971484654308916,
+      "barrier_z": 0.5319229364395142,
+      "gamma": 0.41821473836898804,
+      "gauge_index": 1
+    }
+  ],
+  "output_contract": "top-K candidate cluster, not a unique true parameter point"
+}

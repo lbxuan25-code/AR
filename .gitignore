@@ -1,0 +1,17 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+outputs/**/*.pt
+outputs/**/*.pth
+outputs/**/*.ckpt
+outputs/**/*.npz
+outputs/**/*.npy
+outputs/**/*.log
+outputs/**/*.jsonl
+outputs/source/cache/
+data_cache/
+

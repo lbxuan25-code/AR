@@ -1,0 +1,59 @@
+{
+  "baseline_source": {
+    "repository": "local migration from LNO327_AR_Phenomenology",
+    "normal_state_preset": "base_normal_state_params",
+    "pairing_preset": "base_pairing_params",
+    "consistency_note": "migrated round-1 baseline is intended to match the old repository baseline values"
+  },
+  "transport": {
+    "interface_angle": 0.0,
+    "barrier_z": 0.5,
+    "gamma": 1.0,
+    "temperature_kelvin": 3.0
+  },
+  "bias_grid": {
+    "bias_max_meV": 40.0,
+    "num_bias": 601
+  },
+  "pairing_params": {
+    "eta_z_s": [
+      0.0,
+      0.0
+    ],
+    "eta_z_perp": [
+      -12.63182175722998,
+      1.2811826512138103
+    ],
+    "eta_x_s": [
+      -0.26763071583212805,
+      0.02714444223421438
+    ],
+    "eta_x_d": [
+      -2.0731608573908547e-05,
+      -9.873133906390484e-06
+    ],
+    "eta_zx_d": [
+      0.0,
+      0.0
+    ],
+    "eta_x_perp": [
+      0.0,
+      0.0
+    ]
+  },
+  "forward_summary": {
+    "num_contours": 9,
+    "num_channels": 199,
+    "num_input_channels": 199,
+    "mean_normal_transparency": 0.7999999999999998,
+    "mean_mismatch_penalty": 1.0,
+    "zero_bias_conductance": 1.0917944076789257,
+    "max_conductance": 1.195958285683383,
+    "min_conductance": 0.9991537541458754
+  },
+  "outputs": {
+    "spectrum_figure": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/core/baseline_forward/baseline_spectrum.png",
+    "gap_on_fs_figure": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/core/baseline_forward/baseline_gap_on_fs.png",
+    "summary_json": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/core/baseline_forward/baseline_summary.json"
+  }
+}

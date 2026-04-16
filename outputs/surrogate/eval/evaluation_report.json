@@ -1,0 +1,14 @@
+{
+  "test_mse": 0.01212545203934756,
+  "derivative_mse": 0.005615971269223591,
+  "zero_bias_error": 0.1279365470679479,
+  "peak_position_error": 4.029629629629628,
+  "dynamic_range_error": 0.22461912387351646,
+  "low_bias_mse": 0.03113189926168425,
+  "peak_region_mse": 0.01430777203154001,
+  "luo_source_like_heldout": {
+    "num_samples": 5,
+    "mse": 0.011546038093586562,
+    "low_bias_mse": 0.013572087348040725
+  }
+}

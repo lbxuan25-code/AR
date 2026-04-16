@@ -1,0 +1,17 @@
+{
+  "dataset_name": "pairing_transport_dataset",
+  "scale": "smoke",
+  "num_samples": 120,
+  "bias_max_meV": 40.0,
+  "num_bias": 601,
+  "nk": 31,
+  "interface_angle": 0.0,
+  "temperature_kelvin": 3.0,
+  "seed": 1234,
+  "dataset_path": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/dataset/pairing_transport_dataset_smoke.npz",
+  "categories": {
+    "A_luo_anchor": 39,
+    "B_local_perturbation": 29,
+    "C_transport_scan": 52
+  }
+}
