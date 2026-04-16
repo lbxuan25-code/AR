@@ -1,0 +1,321 @@
+{
+  "retained_channel_residual_stats": {
+    "eta_z_s": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "median_abs": 0.0,
+      "p95_abs": 0.0
+    },
+    "eta_z_perp": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "median_abs": 0.0,
+      "p95_abs": 0.0
+    },
+    "eta_x_s": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "median_abs": 0.0,
+      "p95_abs": 0.0
+    },
+    "eta_x_d": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "median_abs": 0.0,
+      "p95_abs": 0.0
+    }
+  },
+  "reconstruction_residual_stats": {
+    "R_x_xx_A": {
+      "max_abs": 5.728578676879116e-14,
+      "mean_abs": 1.5565754643448676e-15,
+      "median_abs": 0.0,
+      "p95_abs": 7.105427357601002e-15
+    },
+    "R_x_xx_B": {
+      "max_abs": 4.135953406584883,
+      "mean_abs": 0.1105784515036991,
+      "median_abs": 1.0652971752473897e-14,
+      "p95_abs": 0.05478247962267947
+    },
+    "R_y_xx_A": {
+      "max_abs": 5.687116766346677e-14,
+      "mean_abs": 1.5782342619641704e-15,
+      "median_abs": 0.0,
+      "p95_abs": 7.105427357601002e-15
+    },
+    "R_y_xx_B": {
+      "max_abs": 4.147004351129855,
+      "mean_abs": 0.11063703616023668,
+      "median_abs": 8.658355733730682e-15,
+      "p95_abs": 0.05561166666175732
+    },
+    "R_x_zz_A": {
+      "max_abs": 69.9803500591014,
+      "mean_abs": 6.084260870666347,
+      "median_abs": 0.0025697100384455534,
+      "p95_abs": 40.7440388608407
+    },
+    "R_x_zz_B": {
+      "max_abs": 69.98035009150031,
+      "mean_abs": 6.084482533467631,
+      "median_abs": 0.003626916519279857,
+      "p95_abs": 40.744038860841414
+    },
+    "R_y_zz_A": {
+      "max_abs": 69.9803500591014,
+      "mean_abs": 6.084260870666347,
+      "median_abs": 0.0025697100384455534,
+      "p95_abs": 40.7440388608407
+    },
+    "R_y_zz_B": {
+      "max_abs": 69.9803500266029,
+      "mean_abs": 6.084415304004092,
+      "median_abs": 0.00329582538965978,
+      "p95_abs": 40.74403886083979
+    },
+    "R_z_perp_02": {
+      "max_abs": 2.847716647714797e-14,
+      "mean_abs": 9.673336056018991e-16,
+      "median_abs": 0.0,
+      "p95_abs": 7.105427357601002e-15
+    },
+    "R_z_perp_20": {
+      "max_abs": 2.842170943040401e-14,
+      "mean_abs": 9.80727769877616e-16,
+      "median_abs": 6.938893903907228e-18,
+      "p95_abs": 7.105427357601002e-15
+    }
+  },
+  "omitted_channel_stats": {
+    "z_sector_d_like_omitted": {
+      "max_abs": 69.9803500591014,
+      "mean_abs": 6.084260870666347,
+      "median_abs": 0.0025697100384455534,
+      "p95_abs": 40.7440388608407
+    },
+    "x_perp_candidate": {
+      "max_abs": 20.101615327495637,
+      "mean_abs": 5.407646720631431,
+      "median_abs": 2.7573073946424844,
+      "p95_abs": 17.148366768806397
+    },
+    "zx_d_candidate_aggregate": {
+      "max_abs": 12.664953375150832,
+      "mean_abs": 2.4216216735657645,
+      "median_abs": 0.9599594171320052,
+      "p95_abs": 9.698319914807874
+    }
+  },
+  "candidate_hidden_channel_scan": {
+    "delta_x_sym_01": {
+      "max_abs": 12.664952851024434,
+      "mean_abs": 2.9919953588482127,
+      "median_abs": 1.9444529778907687,
+      "p95_abs": 10.214265642994516
+    },
+    "delta_x_sym_23": {
+      "max_abs": 12.664952850746177,
+      "mean_abs": 2.991981557487411,
+      "median_abs": 1.9444529778907604,
+      "p95_abs": 10.214265648560804
+    },
+    "delta_y_sym_01": {
+      "max_abs": 12.664953924347158,
+      "mean_abs": 3.1783878283919975,
+      "median_abs": 2.1998905662789863,
+      "p95_abs": 10.214131967445812
+    },
+    "delta_y_sym_23": {
+      "max_abs": 12.66495392462295,
+      "mean_abs": 3.178379594051874,
+      "median_abs": 2.199890566278989,
+      "p95_abs": 10.214131961789656
+    },
+    "delta_z_sym_01": {
+      "max_abs": 12.345584045369533,
+      "mean_abs": 0.9755268256923129,
+      "median_abs": 0.0012906573689727722,
+      "p95_abs": 6.0886306654172735
+    },
+    "delta_z_sym_23": {
+      "max_abs": 12.345584046240754,
+      "mean_abs": 0.9755297549205875,
+      "median_abs": 0.0012906279866417216,
+      "p95_abs": 6.088630665543927
+    },
+    "delta_z_sym_03": {
+      "max_abs": 42.134367273666186,
+      "mean_abs": 4.964703930687861,
+      "median_abs": 0.0019457986342372691,
+      "p95_abs": 31.86432345478986
+    },
+    "delta_z_sym_12": {
+      "max_abs": 42.13436727209372,
+      "mean_abs": 4.9646995588116,
+      "median_abs": 0.0019457986342374032,
+      "p95_abs": 31.86432345478986
+    }
+  },
+  "zx_d_reasonable_source_analogues": {
+    "delta_x_sym_01": {
+      "max_abs": 12.664952851024434,
+      "mean_abs": 2.9919953588482127,
+      "median_abs": 1.9444529778907687,
+      "p95_abs": 10.214265642994516
+    },
+    "delta_x_sym_23": {
+      "max_abs": 12.664952850746177,
+      "mean_abs": 2.991981557487411,
+      "median_abs": 1.9444529778907604,
+      "p95_abs": 10.214265648560804
+    },
+    "delta_y_sym_01": {
+      "max_abs": 12.664953924347158,
+      "mean_abs": 3.1783878283919975,
+      "median_abs": 2.1998905662789863,
+      "p95_abs": 10.214131967445812
+    },
+    "delta_y_sym_23": {
+      "max_abs": 12.66495392462295,
+      "mean_abs": 3.178379594051874,
+      "median_abs": 2.199890566278989,
+      "p95_abs": 10.214131961789656
+    }
+  },
+  "retained_ratio_stats": {
+    "retained_ratio_x": {
+      "min": 0.01080419133176804,
+      "max": 1.0064844395875125,
+      "mean": 0.7173277732821792,
+      "median": 0.7028918197462382,
+      "p05": 0.42882652282577677,
+      "p95": 0.9844146900394172
+    },
+    "retained_ratio_y": {
+      "min": 0.035457934044548944,
+      "max": 0.9999999999999998,
+      "mean": 0.6971554470627117,
+      "median": 0.6959115989235567,
+      "p05": 0.4156884008914784,
+      "p95": 0.9648920173965172
+    },
+    "retained_ratio_z": {
+      "min": 1.2490728444780783e-09,
+      "max": 0.999999999999316,
+      "mean": 0.68983824414418,
+      "median": 0.7895444976591978,
+      "p05": 0.0005591851029523575,
+      "p95": 0.92355350270816
+    },
+    "retained_ratio_total": {
+      "min": 0.5896809666858724,
+      "max": 1.0000000764720083,
+      "mean": 0.78682969530098,
+      "median": 0.7571066634744963,
+      "p05": 0.680074051252756,
+      "p95": 0.9640054367947812
+    },
+    "omitted_fraction_total": {
+      "min": 1.9729201397617266e-07,
+      "max": 0.8076362779917797,
+      "mean": 0.5935690363064849,
+      "median": 0.6532912827541139,
+      "p05": 0.2659671924377966,
+      "p95": 0.7331434220265891
+    }
+  },
+  "norm_stats": {
+    "source_norm_total": {
+      "min": 0.08445626026876017,
+      "max": 791.200839616699,
+      "mean": 144.43256671485364,
+      "median": 112.32030641795596,
+      "p05": 0.97219236055067,
+      "p95": 527.5893528729108
+    },
+    "recon_norm_total": {
+      "min": 0.06481426782049192,
+      "max": 743.3156926747289,
+      "mean": 123.76256127043531,
+      "median": 88.67330645766324,
+      "p05": 0.6777919534935858,
+      "p95": 499.88959839753517
+    },
+    "residual_norm_total": {
+      "min": 0.0001356001133293563,
+      "max": 271.1285704798343,
+      "mean": 68.4763753348128,
+      "median": 59.27361303524721,
+      "p05": 0.6976309021425329,
+      "p95": 173.2271657870564
+    }
+  },
+  "figure_level_consistency_stats": {
+    "two_eta_x_s_vs_dx_plus_dy_11": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "median_abs": 0.0,
+      "p95_abs": 0.0
+    },
+    "two_eta_x_d_vs_dx_minus_dy_11": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "median_abs": 0.0,
+      "p95_abs": 0.0
+    },
+    "two_eta_z_s_vs_dx_plus_dy_00": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0,
+      "median_abs": 0.0,
+      "p95_abs": 0.0
+    },
+    "eta_z_perp_vs_dz_02": {
+      "max_abs": 2.847716647714797e-14,
+      "mean_abs": 9.673336056018991e-16,
+      "median_abs": 0.0,
+      "p95_abs": 7.105427357601002e-15
+    }
+  },
+  "final_textual_verdict": {
+    "projection_implementation_correct": "Yes. The current luo_projection.py implementation matches its design formulas, and retained-channel residuals are at machine-precision scale.",
+    "projection_figure_level_consistent": "Yes. The retained combinations align with the Luo figure-level s/d/perp observables used in plot_Fig1.py.",
+    "projection_full_rmft_equivalent": "No. Current round-1 projection is a restricted approximation to the RMFT source, not a full equivalence to the complete RMFT pairing tensor."
+  },
+  "num_samples": 11833,
+  "source_semantics_checks": {
+    "pairing_component_semantics": {
+      "level": "strong_evidence_support",
+      "supported": true,
+      "detail": "Loader names the six RMFT tensor slices as (chi_x, chi_y, chi_z, delta_x, delta_y, delta_z)."
+    },
+    "orbital_basis_alignment": {
+      "level": "strong_evidence_support",
+      "supported": true,
+      "detail": "H4band.py documents the source order as (dz2, dx2, dz2, dx2), which aligns with local (Az, Ax, Bz, Bx)."
+    },
+    "figure_level_channel_usage": {
+      "level": "strong_evidence_support",
+      "supported": true,
+      "detail": "plot_Fig1.py uses Pms[3], Pms[4], Pms[5] as delta_x, delta_y, delta_z and reads [1,1], [0,0], [0,2], matching the retained observables used by the local projection."
+    },
+    "mu_unit_sanity": {
+      "level": "strong_evidence_support",
+      "supported": true,
+      "detail": "Mu2.npy[0] * 1000 nearly matches local BASE_MU_DIAG, strongly supporting the eV -> meV conversion for chemical potentials.",
+      "metric": {
+        "max_abs_diff_meV": 0.0,
+        "max_rel_diff": 0.0
+      }
+    },
+    "delta_unit_sanity": {
+      "level": "weak_evidence_support",
+      "supported": true,
+      "detail": "The same source npz payload family stores Mu fields in eV-scale numbers, and converting delta entries by 1000 moves them into the meV scale used by the local pairing baseline. This is supportive but not a direct proof from source-side comments.",
+      "metric": {
+        "median_abs_raw_delta_eV": 0.10485323027215848,
+        "median_abs_converted_delta_meV": 104.8532302721585
+      }
+    }
+  }
+}
