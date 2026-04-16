@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .parameters import ModelParams, NormalStateParams, PairingParams
+from .parameters import ModelParams, NormalStateParams, PairingParams, PhysicalPairingChannels
 
 
 BASE_MU_DIAG: tuple[float, float, float, float] = (
@@ -51,6 +51,27 @@ def base_pairing_params() -> PairingParams:
         eta_x_d=-2.0731608573908547e-05 - 9.873133906390484e-06j,
         eta_zx_d=0.0 + 0.0j,
         eta_x_perp=0.0 + 0.0j,
+    )
+
+
+def base_physical_pairing_channels() -> PhysicalPairingChannels:
+    """Return the round-2 physical channel view of the legacy baseline.
+
+    This is a compatibility baseline rather than a newly refit round-2 source
+    anchor. Newly introduced round-2 channels are initialized to zero until a
+    dedicated round-2 baseline is chosen.
+    """
+
+    legacy = base_pairing_params()
+    return PhysicalPairingChannels(
+        delta_zz_s=legacy.eta_z_s,
+        delta_zz_d=0.0 + 0.0j,
+        delta_xx_s=legacy.eta_x_s,
+        delta_xx_d=legacy.eta_x_d,
+        delta_zx_s=0.0 + 0.0j,
+        delta_zx_d=legacy.eta_zx_d,
+        delta_perp_z=legacy.eta_z_perp,
+        delta_perp_x=legacy.eta_x_perp,
     )
 
 

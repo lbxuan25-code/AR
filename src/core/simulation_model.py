@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from numpy.typing import NDArray
 
 from .bdg import bdg_matrix
-from .conventions import BASIS_ORDER, PAIRING_CHANNELS
+from .conventions import BASIS_ORDER, PAIRING_CHANNELS, PHYSICAL_PAIRING_CHANNELS
 from .normal_state import h0_matrix
 from .pairing import delta_matrix
 from .parameters import ModelParams
@@ -21,7 +21,8 @@ class SimulationModel:
     params: ModelParams
     name: str = "base_model"
     basis: tuple[str, str, str, str] = BASIS_ORDER
-    pairing_channels: tuple[str, str, str, str, str, str] = PAIRING_CHANNELS
+    pairing_channels: tuple[str, ...] = PHYSICAL_PAIRING_CHANNELS
+    legacy_pairing_channels: tuple[str, ...] = PAIRING_CHANNELS
 
     def build_normal_state(self, kx: float, ky: float) -> NDArray[np.complex128]:
         """Construct the normal-state Hamiltonian ``h0(k)``."""

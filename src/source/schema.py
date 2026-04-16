@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from core.parameters import PairingParams
+from core.parameters import PairingParams, PhysicalPairingChannels
 
 
 class ProjectionMode(StrEnum):
@@ -40,4 +40,6 @@ class LuoSample:
     source_chemical_potential: NDArray[np.float64] | None
     projected_pairing_params: PairingParams | None = None
     projection_provenance: dict[str, ProjectionRecord] = field(default_factory=dict)
-
+    projected_physical_channels: PhysicalPairingChannels | None = None
+    round2_projection_provenance: dict[str, ProjectionRecord] = field(default_factory=dict)
+    round2_projection_metrics: dict[str, Any] = field(default_factory=dict)

@@ -1,0 +1,54 @@
+{
+  "pairing_source": "compatibility_baseline_physical_channels",
+  "pairing_channels": {
+    "delta_zz_s": [
+      0.0,
+      0.0
+    ],
+    "delta_zz_d": [
+      0.0,
+      0.0
+    ],
+    "delta_xx_s": [
+      -0.26763071583212805,
+      0.02714444223421438
+    ],
+    "delta_xx_d": [
+      -2.0731608573908547e-05,
+      -9.873133906390484e-06
+    ],
+    "delta_zx_s": [
+      0.0,
+      0.0
+    ],
+    "delta_zx_d": [
+      0.0,
+      0.0
+    ],
+    "delta_perp_z": [
+      -12.63182175722998,
+      1.2811826512138103
+    ],
+    "delta_perp_x": [
+      0.0,
+      0.0
+    ]
+  },
+  "transport": {
+    "interface_angle": 0.0,
+    "barrier_z": 0.5,
+    "gamma": 1.0,
+    "temperature_kelvin": 3.0
+  },
+  "forward_summary": {
+    "num_channels": 199,
+    "num_input_channels": 199,
+    "num_contours": 5,
+    "mean_normal_transparency": 0.7999999999999998,
+    "mean_mismatch_penalty": 1.0
+  },
+  "outputs": {
+    "spectrum": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/core/round2_baseline_forward/round2_spectrum.png",
+    "summary": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/core/round2_baseline_forward/round2_forward_summary.json"
+  }
+}

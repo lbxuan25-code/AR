@@ -68,11 +68,37 @@ class PairingParams:
 
 
 @dataclass(slots=True)
+class PhysicalPairingChannels:
+    """Round-2 physical order-parameter layer.
+
+    The channels are organized by orbital sector, bond symmetry, and interlayer
+    structure rather than by the smaller round-1 fitting ansatz.
+    """
+
+    delta_zz_s: complex = 0.0 + 0.0j
+    delta_zz_d: complex = 0.0 + 0.0j
+    delta_xx_s: complex = 0.0 + 0.0j
+    delta_xx_d: complex = 0.0 + 0.0j
+    delta_zx_s: complex = 0.0 + 0.0j
+    delta_zx_d: complex = 0.0 + 0.0j
+    delta_perp_z: complex = 0.0 + 0.0j
+    delta_perp_x: complex = 0.0 + 0.0j
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a plain dictionary representation."""
+
+        return asdict(self)
+
+
+PairingLike = PairingParams | PhysicalPairingChannels
+
+
+@dataclass(slots=True)
 class ModelParams:
     """Combined parameter container for normal-state and pairing sectors."""
 
     normal_state: NormalStateParams
-    pairing: PairingParams
+    pairing: PairingLike
 
     def to_dict(self) -> dict[str, object]:
         """Return a nested dictionary representation."""
