@@ -15,7 +15,7 @@ if str(SRC_DIR) not in sys.path:
 
 from core.parameters import ModelParams
 from core.pipeline import SpectroscopyPipeline
-from core.presets import base_normal_state_params, base_physical_pairing_channels
+from core.presets import base_normal_state_params, base_physical_pairing_channels, compatibility_physical_pairing_channels
 from core.simulation_model import SimulationModel
 from source.luo_loader import load_luo_samples
 from source.round2_projection import project_luo_sample_to_round2_channels
@@ -41,7 +41,12 @@ def parse_args() -> argparse.Namespace:
         "--sample-index",
         type=int,
         default=None,
-        help="Optional Luo sample index. If omitted, use the compatibility baseline physical channels.",
+        help="Optional Luo sample index. If omitted, use the formal Stage-3 round-2 baseline.",
+    )
+    parser.add_argument(
+        "--use-compatibility-baseline",
+        action="store_true",
+        help="Use the legacy round-1-compatible physical-channel baseline instead of the formal Stage-3 round-2 baseline.",
     )
     parser.add_argument(
         "--output-dir",
@@ -67,8 +72,12 @@ def main() -> None:
     output_dir = args.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    pairing = base_physical_pairing_channels()
-    source_label = "compatibility_baseline_physical_channels"
+    pairing = compatibility_physical_pairing_channels() if args.use_compatibility_baseline else base_physical_pairing_channels()
+    source_label = (
+        "legacy_compatibility_baseline_physical_channels"
+        if args.use_compatibility_baseline
+        else "formal_round2_baseline_physical_channels"
+    )
     if args.sample_index is not None:
         sample = load_luo_samples()[int(args.sample_index)]
         projected = project_luo_sample_to_round2_channels(sample)

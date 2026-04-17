@@ -54,7 +54,7 @@
 - `z-sector d-like omitted = 0.5*(delta_x[0,0]-delta_y[0,0])`: p95 abs = 40.744 meV
 - `x_perp candidate` from symmetrized `delta_z[1,3]`: p95 abs = 17.1484 meV
 - `zx_d candidate aggregate`: p95 abs = 9.69832 meV
-- total retained ratio: p05 = 0.6801, median = 0.7571, p95 = 0.9640
+- total retained ratio (`1 - residual/source`): p05 = 0.2669, median = 0.3467, p95 = 0.7340
 
 更合理的 `zx_d` source analogue 候选条目：
 - `delta_y_sym_01`: mean abs = 3.17839 meV, p95 abs = 10.2141 meV

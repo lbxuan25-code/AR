@@ -25,6 +25,7 @@ from core.presets import BASE_MU_DIAG
 
 from .luo_loader import PAIRING_COMPONENT_NAMES, ensure_luo_repo, load_luo_samples
 from .luo_projection import EV_TO_MEV, project_luo_sample_to_pairing
+from .projection_metrics import build_projection_metric_bundle
 from .schema import LuoSample
 
 
@@ -101,10 +102,6 @@ def _real_stats(values: np.ndarray) -> dict[str, float]:
         "p05": float(np.percentile(arr, 5.0)),
         "p95": float(np.percentile(arr, 95.0)),
     }
-
-
-def _fro_norm(matrix: np.ndarray) -> float:
-    return float(np.linalg.norm(np.asarray(matrix, dtype=np.complex128), ord="fro"))
 
 
 def _evidence_record(level: str, supported: bool, detail: str, metric: dict[str, float] | None = None) -> dict[str, object]:
@@ -295,18 +292,7 @@ def _diagnose_single_sample(sample: LuoSample) -> dict[str, object]:
         "delta_z_sym_12": _symmetrized(delta_z, 1, 2),
     }
 
-    source_norm_x = _fro_norm(delta_x)
-    source_norm_y = _fro_norm(delta_y)
-    source_norm_z = _fro_norm(delta_z)
-    recon_norm_x = _fro_norm(delta_x_recon)
-    recon_norm_y = _fro_norm(delta_y_recon)
-    recon_norm_z = _fro_norm(delta_z_recon)
-    residual_norm_x = _fro_norm(delta_x - delta_x_recon)
-    residual_norm_y = _fro_norm(delta_y - delta_y_recon)
-    residual_norm_z = _fro_norm(delta_z - delta_z_recon)
-    source_norm_total = float(np.sqrt(source_norm_x**2 + source_norm_y**2 + source_norm_z**2))
-    recon_norm_total = float(np.sqrt(recon_norm_x**2 + recon_norm_y**2 + recon_norm_z**2))
-    residual_norm_total = float(np.sqrt(residual_norm_x**2 + residual_norm_y**2 + residual_norm_z**2))
+    metrics = build_projection_metric_bundle(delta_x, delta_y, delta_z, delta_x_recon, delta_y_recon, delta_z_recon)
 
     figure_level = {
         "two_eta_x_s_vs_dx_plus_dy_11": 2.0 * projected["eta_x_s"] - (delta_x[1, 1] + delta_y[1, 1]),
@@ -324,23 +310,7 @@ def _diagnose_single_sample(sample: LuoSample) -> dict[str, object]:
         "omitted_metrics": omitted_metrics,
         "zx_scan": zx_scan,
         "norms": {
-            "source_norm_x": source_norm_x,
-            "source_norm_y": source_norm_y,
-            "source_norm_z": source_norm_z,
-            "recon_norm_x": recon_norm_x,
-            "recon_norm_y": recon_norm_y,
-            "recon_norm_z": recon_norm_z,
-            "residual_norm_x": residual_norm_x,
-            "residual_norm_y": residual_norm_y,
-            "residual_norm_z": residual_norm_z,
-            "source_norm_total": source_norm_total,
-            "recon_norm_total": recon_norm_total,
-            "residual_norm_total": residual_norm_total,
-            "retained_ratio_x": float(recon_norm_x / source_norm_x) if source_norm_x > 0.0 else 1.0,
-            "retained_ratio_y": float(recon_norm_y / source_norm_y) if source_norm_y > 0.0 else 1.0,
-            "retained_ratio_z": float(recon_norm_z / source_norm_z) if source_norm_z > 0.0 else 1.0,
-            "retained_ratio_total": float(recon_norm_total / source_norm_total) if source_norm_total > 0.0 else 1.0,
-            "omitted_fraction_total": float(residual_norm_total / source_norm_total) if source_norm_total > 0.0 else 0.0,
+            **metrics,
         },
         "figure_level_checks": figure_level,
     }
@@ -613,7 +583,7 @@ def write_markdown_report(
             f"- `z-sector d-like omitted = 0.5*(delta_x[0,0]-delta_y[0,0])`: p95 abs = {omitted['z_sector_d_like_omitted']['p95_abs']:.6g} meV",
             f"- `x_perp candidate` from symmetrized `delta_z[1,3]`: p95 abs = {omitted['x_perp_candidate']['p95_abs']:.6g} meV",
             f"- `zx_d candidate aggregate`: p95 abs = {omitted['zx_d_candidate_aggregate']['p95_abs']:.6g} meV",
-            f"- total retained ratio: p05 = {ratio['p05']:.4f}, median = {ratio['median']:.4f}, p95 = {ratio['p95']:.4f}",
+            f"- total retained ratio (`1 - residual/source`): p05 = {ratio['p05']:.4f}, median = {ratio['median']:.4f}, p95 = {ratio['p95']:.4f}",
             "",
             "更合理的 `zx_d` source analogue 候选条目：",
             *reasonable_zx_lines,

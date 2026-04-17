@@ -72,7 +72,9 @@ class PhysicalPairingChannels:
     """Round-2 physical order-parameter layer.
 
     The channels are organized by orbital sector, bond symmetry, and interlayer
-    structure rather than by the smaller round-1 fitting ansatz.
+    structure rather than by the smaller round-1 fitting ansatz. Stage 3 treats
+    ``delta_zx_s`` as an optional weak channel; the remaining seven channels
+    are the formal core truth-layer channels.
     """
 
     delta_zz_s: complex = 0.0 + 0.0j

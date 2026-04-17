@@ -43,3 +43,4 @@ class LuoSample:
     projected_physical_channels: PhysicalPairingChannels | None = None
     round2_projection_provenance: dict[str, ProjectionRecord] = field(default_factory=dict)
     round2_projection_metrics: dict[str, Any] = field(default_factory=dict)
+    round2_projection_metadata: dict[str, Any] = field(default_factory=dict)

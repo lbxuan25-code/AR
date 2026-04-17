@@ -21,3 +21,13 @@ PHYSICAL_PAIRING_CHANNELS: tuple[str, str, str, str, str, str, str, str] = (
     "delta_perp_z",
     "delta_perp_x",
 )
+CORE_PHYSICAL_PAIRING_CHANNELS: tuple[str, str, str, str, str, str, str] = (
+    "delta_zz_s",
+    "delta_zz_d",
+    "delta_xx_s",
+    "delta_xx_d",
+    "delta_zx_d",
+    "delta_perp_z",
+    "delta_perp_x",
+)
+OPTIONAL_PHYSICAL_PAIRING_CHANNELS: tuple[str, ...] = ("delta_zx_s",)

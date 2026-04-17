@@ -26,9 +26,10 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     per_sample, round2_summary, _ = summarize_round2_projection(max_samples=args.max_samples)
-    summary_path, examples_path, _ = write_round2_projection_outputs(args.output_dir, per_sample, round2_summary)
+    summary_path, examples_path, _, baseline_path = write_round2_projection_outputs(args.output_dir, per_sample, round2_summary)
     print(f"Wrote summary: {summary_path}")
     print(f"Wrote examples: {examples_path}")
+    print(f"Wrote baseline selection: {baseline_path}")
 
 
 if __name__ == "__main__":

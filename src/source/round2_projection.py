@@ -2,25 +2,73 @@
 
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import dataclass, field, replace
+from functools import lru_cache
 
 import numpy as np
 
+from core.conventions import CORE_PHYSICAL_PAIRING_CHANNELS, OPTIONAL_PHYSICAL_PAIRING_CHANNELS, PHYSICAL_PAIRING_CHANNELS
 from core.parameters import PhysicalPairingChannels
 
 from .luo_projection import EV_TO_MEV
+from .projection_metrics import build_projection_metric_bundle
 from .schema import LuoSample, ProjectionMode, ProjectionRecord
 
-ROUND2_CHANNEL_NAMES: tuple[str, ...] = (
-    "delta_zz_s",
-    "delta_zz_d",
-    "delta_xx_s",
-    "delta_xx_d",
-    "delta_zx_s",
-    "delta_zx_d",
-    "delta_perp_z",
-    "delta_perp_x",
-)
+ROUND2_CHANNEL_NAMES: tuple[str, ...] = PHYSICAL_PAIRING_CHANNELS
+ROUND2_CORE_CHANNEL_NAMES: tuple[str, ...] = CORE_PHYSICAL_PAIRING_CHANNELS
+ROUND2_OPTIONAL_CHANNEL_NAMES: tuple[str, ...] = OPTIONAL_PHYSICAL_PAIRING_CHANNELS
+
+
+@dataclass(frozen=True, slots=True)
+class Round2ProjectionConfig:
+    """Stage-3 projection controls for the round-2 truth layer."""
+
+    weight_x: float = 1.0
+    weight_y: float = 1.0
+    weight_z: float = 1.15
+    gauge_anchor_priority: tuple[str, ...] = ROUND2_CORE_CHANNEL_NAMES + ROUND2_OPTIONAL_CHANNEL_NAMES
+    gauge_min_anchor_abs: float = 1.0e-10
+    channel_regularization: dict[str, float] = field(
+        default_factory=lambda: {
+            "delta_zz_s": 1.0e-4,
+            "delta_zz_d": 2.0e-4,
+            "delta_xx_s": 1.0e-4,
+            "delta_xx_d": 1.0e-4,
+            "delta_zx_s": 5.0e-3,
+            "delta_zx_d": 7.5e-4,
+            "delta_perp_z": 1.0e-4,
+            "delta_perp_x": 7.5e-4,
+        }
+    )
+
+    def block_weights(self) -> tuple[float, float, float]:
+        return (float(self.weight_x), float(self.weight_y), float(self.weight_z))
+
+    def regularization_vector(self) -> np.ndarray:
+        return np.asarray(
+            [float(self.channel_regularization.get(name, 0.0)) for name in ROUND2_CHANNEL_NAMES],
+            dtype=np.float64,
+        )
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "block_weights": {
+                "delta_x": float(self.weight_x),
+                "delta_y": float(self.weight_y),
+                "delta_z": float(self.weight_z),
+            },
+            "channel_regularization": {
+                name: float(self.channel_regularization.get(name, 0.0))
+                for name in ROUND2_CHANNEL_NAMES
+            },
+            "core_channels": list(ROUND2_CORE_CHANNEL_NAMES),
+            "optional_channels": list(ROUND2_OPTIONAL_CHANNEL_NAMES),
+            "gauge_anchor_priority": list(self.gauge_anchor_priority),
+            "gauge_min_anchor_abs": float(self.gauge_min_anchor_abs),
+        }
+
+
+DEFAULT_ROUND2_PROJECTION_CONFIG = Round2ProjectionConfig()
 
 
 def source_pairing_tensors_meV(sample: LuoSample) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -87,6 +135,73 @@ def round2_basis_tensors() -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray
     return basis
 
 
+@lru_cache(maxsize=1)
+def _round2_design_matrix() -> np.ndarray:
+    basis = round2_basis_tensors()
+    return np.column_stack([flatten_source_tensors(*basis[name]) for name in ROUND2_CHANNEL_NAMES])
+
+
+def _weighted_overlap_coefficient(
+    target_x: np.ndarray,
+    target_y: np.ndarray,
+    target_z: np.ndarray,
+    basis_triplet: tuple[np.ndarray, np.ndarray, np.ndarray],
+    block_weights: tuple[float, float, float],
+) -> complex:
+    numerator = 0.0 + 0.0j
+    denominator = 0.0
+    for weight, target, basis_matrix in zip(
+        block_weights,
+        (target_x, target_y, target_z),
+        basis_triplet,
+        strict=True,
+    ):
+        numerator += float(weight) * np.vdot(basis_matrix, target)
+        denominator += float(weight) * float(np.vdot(basis_matrix, basis_matrix).real)
+    if denominator <= 0.0:
+        return 0.0 + 0.0j
+    return complex(numerator / denominator)
+
+
+def gauge_fix_source_tensors(
+    delta_x: np.ndarray,
+    delta_y: np.ndarray,
+    delta_z: np.ndarray,
+    config: Round2ProjectionConfig = DEFAULT_ROUND2_PROJECTION_CONFIG,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, object]]:
+    """Apply a global phase convention before fitting.
+
+    The source tensors are rotated so that the strongest prioritized anchor
+    channel becomes real and non-negative. This keeps baseline aggregation and
+    channel statistics gauge-consistent across samples.
+    """
+
+    basis = round2_basis_tensors()
+    block_weights = config.block_weights()
+    anchor_name = config.gauge_anchor_priority[0]
+    anchor_coeff = 0.0 + 0.0j
+    for candidate in config.gauge_anchor_priority:
+        coeff = _weighted_overlap_coefficient(delta_x, delta_y, delta_z, basis[candidate], block_weights)
+        if abs(coeff) >= config.gauge_min_anchor_abs:
+            anchor_name = candidate
+            anchor_coeff = coeff
+            break
+    phase = float(np.angle(anchor_coeff)) if abs(anchor_coeff) > 0.0 else 0.0
+    rotation = np.exp(-1.0j * phase)
+    return (
+        np.asarray(delta_x, dtype=np.complex128) * rotation,
+        np.asarray(delta_y, dtype=np.complex128) * rotation,
+        np.asarray(delta_z, dtype=np.complex128) * rotation,
+        {
+            "anchor_channel": anchor_name,
+            "anchor_magnitude_meV": float(abs(anchor_coeff)),
+            "gauge_phase_radians": phase,
+            "gauge_rotation_re": float(np.real(rotation)),
+            "gauge_rotation_im": float(np.imag(rotation)),
+        },
+    )
+
+
 def flatten_source_tensors(delta_x: np.ndarray, delta_y: np.ndarray, delta_z: np.ndarray) -> np.ndarray:
     """Return one complex vector for joint source reconstruction."""
 
@@ -117,63 +232,76 @@ def reconstruct_source_tensors_from_channels(
     return recon_x, recon_y, recon_z
 
 
-def fit_round2_channels(sample: LuoSample) -> PhysicalPairingChannels:
-    """Solve the constrained complex least-squares fit on the full source tensor."""
+def fit_round2_channels_with_metadata(
+    sample: LuoSample,
+    config: Round2ProjectionConfig = DEFAULT_ROUND2_PROJECTION_CONFIG,
+) -> tuple[PhysicalPairingChannels, dict[str, object]]:
+    """Solve the Stage-3 weighted and regularized complex fit.
+
+    The fit keeps the round-2 channel basis but upgrades the old unconstrained
+    least-squares step by adding:
+
+    - block weights across ``delta_x / delta_y / delta_z``,
+    - per-channel ridge regularization,
+    - a global gauge convention before fitting.
+    """
 
     delta_x, delta_y, delta_z = source_pairing_tensors_meV(sample)
-    target = flatten_source_tensors(delta_x, delta_y, delta_z)
-    basis = round2_basis_tensors()
-    design = np.column_stack(
+    gauge_x, gauge_y, gauge_z, gauge_metadata = gauge_fix_source_tensors(delta_x, delta_y, delta_z, config=config)
+    target = flatten_source_tensors(gauge_x, gauge_y, gauge_z)
+    design = _round2_design_matrix()
+
+    weights = np.concatenate(
         [
-            flatten_source_tensors(*basis[name])
-            for name in ROUND2_CHANNEL_NAMES
+            np.full(delta_x.size, np.sqrt(config.weight_x), dtype=np.float64),
+            np.full(delta_y.size, np.sqrt(config.weight_y), dtype=np.float64),
+            np.full(delta_z.size, np.sqrt(config.weight_z), dtype=np.float64),
         ]
+    ).astype(np.complex128)
+    weighted_target = weights * target
+    weighted_design = weights[:, None] * design
+
+    regularization = config.regularization_vector()
+    augmented_design = np.vstack([weighted_design, np.diag(np.sqrt(regularization)).astype(np.complex128)])
+    augmented_target = np.concatenate(
+        [weighted_target, np.zeros(len(ROUND2_CHANNEL_NAMES), dtype=np.complex128)]
     )
-    solution, _, _, _ = np.linalg.lstsq(design, target, rcond=None)
-    return PhysicalPairingChannels(**{name: complex(solution[index]) for index, name in enumerate(ROUND2_CHANNEL_NAMES)})
+    solution, _, _, _ = np.linalg.lstsq(augmented_design, augmented_target, rcond=None)
+    channels = PhysicalPairingChannels(
+        **{name: complex(solution[index]) for index, name in enumerate(ROUND2_CHANNEL_NAMES)}
+    )
+    metadata = {
+        **gauge_metadata,
+        "config": config.to_dict(),
+        "fit_mode": "weighted_ridge_with_global_gauge_fix",
+    }
+    return channels, metadata
+
+
+def fit_round2_channels(
+    sample: LuoSample,
+    config: Round2ProjectionConfig = DEFAULT_ROUND2_PROJECTION_CONFIG,
+) -> PhysicalPairingChannels:
+    """Return only the fitted channels from the Stage-3 projection."""
+
+    channels, _ = fit_round2_channels_with_metadata(sample, config=config)
+    return channels
 
 
 def round2_projection_metrics(
     sample: LuoSample,
     channels: PhysicalPairingChannels,
+    gauge_phase_radians: float = 0.0,
 ) -> dict[str, float]:
     """Return reconstruction metrics for the round-2 physical channel fit."""
 
     delta_x, delta_y, delta_z = source_pairing_tensors_meV(sample)
+    rotation = np.exp(-1.0j * float(gauge_phase_radians))
+    gauge_x = delta_x * rotation
+    gauge_y = delta_y * rotation
+    gauge_z = delta_z * rotation
     recon_x, recon_y, recon_z = reconstruct_source_tensors_from_channels(channels)
-
-    source_norm_x = float(np.linalg.norm(delta_x, ord="fro"))
-    source_norm_y = float(np.linalg.norm(delta_y, ord="fro"))
-    source_norm_z = float(np.linalg.norm(delta_z, ord="fro"))
-    recon_norm_x = float(np.linalg.norm(recon_x, ord="fro"))
-    recon_norm_y = float(np.linalg.norm(recon_y, ord="fro"))
-    recon_norm_z = float(np.linalg.norm(recon_z, ord="fro"))
-    residual_norm_x = float(np.linalg.norm(delta_x - recon_x, ord="fro"))
-    residual_norm_y = float(np.linalg.norm(delta_y - recon_y, ord="fro"))
-    residual_norm_z = float(np.linalg.norm(delta_z - recon_z, ord="fro"))
-
-    source_norm_total = float(np.sqrt(source_norm_x**2 + source_norm_y**2 + source_norm_z**2))
-    recon_norm_total = float(np.sqrt(recon_norm_x**2 + recon_norm_y**2 + recon_norm_z**2))
-    residual_norm_total = float(np.sqrt(residual_norm_x**2 + residual_norm_y**2 + residual_norm_z**2))
-    return {
-        "source_norm_x": source_norm_x,
-        "source_norm_y": source_norm_y,
-        "source_norm_z": source_norm_z,
-        "recon_norm_x": recon_norm_x,
-        "recon_norm_y": recon_norm_y,
-        "recon_norm_z": recon_norm_z,
-        "residual_norm_x": residual_norm_x,
-        "residual_norm_y": residual_norm_y,
-        "residual_norm_z": residual_norm_z,
-        "source_norm_total": source_norm_total,
-        "recon_norm_total": recon_norm_total,
-        "residual_norm_total": residual_norm_total,
-        "retained_ratio_x": float(1.0 - residual_norm_x / source_norm_x) if source_norm_x > 0.0 else 1.0,
-        "retained_ratio_y": float(1.0 - residual_norm_y / source_norm_y) if source_norm_y > 0.0 else 1.0,
-        "retained_ratio_z": float(1.0 - residual_norm_z / source_norm_z) if source_norm_z > 0.0 else 1.0,
-        "retained_ratio_total": float(1.0 - residual_norm_total / source_norm_total) if source_norm_total > 0.0 else 1.0,
-        "omitted_fraction_total": float(residual_norm_total / source_norm_total) if source_norm_total > 0.0 else 0.0,
-    }
+    return build_projection_metric_bundle(gauge_x, gauge_y, gauge_z, recon_x, recon_y, recon_z)
 
 
 def _round2_projection_provenance() -> dict[str, ProjectionRecord]:
@@ -229,20 +357,31 @@ def _round2_projection_provenance() -> dict[str, ProjectionRecord]:
     }
 
 
-def project_luo_sample_to_round2_channels(sample: LuoSample) -> LuoSample:
+def project_luo_sample_to_round2_channels(
+    sample: LuoSample,
+    config: Round2ProjectionConfig = DEFAULT_ROUND2_PROJECTION_CONFIG,
+) -> LuoSample:
     """Project one Luo sample into the round-2 physical channel layer."""
 
-    channels = fit_round2_channels(sample)
-    metrics = round2_projection_metrics(sample, channels)
+    channels, metadata = fit_round2_channels_with_metadata(sample, config=config)
+    metrics = round2_projection_metrics(
+        sample,
+        channels,
+        gauge_phase_radians=float(metadata["gauge_phase_radians"]),
+    )
     return replace(
         sample,
         projected_physical_channels=channels,
         round2_projection_provenance=_round2_projection_provenance(),
         round2_projection_metrics=metrics,
+        round2_projection_metadata=metadata,
     )
 
 
-def project_luo_samples_to_round2_channels(samples: list[LuoSample]) -> list[LuoSample]:
+def project_luo_samples_to_round2_channels(
+    samples: list[LuoSample],
+    config: Round2ProjectionConfig = DEFAULT_ROUND2_PROJECTION_CONFIG,
+) -> list[LuoSample]:
     """Project a batch of Luo samples into the round-2 physical channel layer."""
 
-    return [project_luo_sample_to_round2_channels(sample) for sample in samples]
+    return [project_luo_sample_to_round2_channels(sample, config=config) for sample in samples]

@@ -54,12 +54,11 @@ def base_pairing_params() -> PairingParams:
     )
 
 
-def base_physical_pairing_channels() -> PhysicalPairingChannels:
-    """Return the round-2 physical channel view of the legacy baseline.
+def compatibility_physical_pairing_channels() -> PhysicalPairingChannels:
+    """Return the legacy baseline translated into the round-2 channel basis.
 
     This is a compatibility baseline rather than a newly refit round-2 source
-    anchor. Newly introduced round-2 channels are initialized to zero until a
-    dedicated round-2 baseline is chosen.
+    anchor. It stays available for explicit round-1 compatibility workflows.
     """
 
     legacy = base_pairing_params()
@@ -72,6 +71,26 @@ def base_physical_pairing_channels() -> PhysicalPairingChannels:
         delta_zx_d=legacy.eta_zx_d,
         delta_perp_z=legacy.eta_z_perp,
         delta_perp_x=legacy.eta_x_perp,
+    )
+
+
+def base_physical_pairing_channels() -> PhysicalPairingChannels:
+    """Return the formal Stage-3 round-2 truth-layer baseline.
+
+    The values are fixed from the median of the low-temperature charge-balanced
+    Luo temperature-sweep cluster selected in the Stage-3 baseline audit
+    (`temperature_eV <= 1e-3`, `p≈0`, first 8 samples).
+    """
+
+    return PhysicalPairingChannels(
+        delta_zz_s=43.47120957876885 - 5.990118039475453e-16j,
+        delta_zz_d=-6.466862302353316e-08 + 1.2953226292173955e-07j,
+        delta_xx_s=-1.7820360737854513 + 1.2994633925908852e-12j,
+        delta_xx_d=-1.3049740214993564e-07 + 2.5302036891064664e-07j,
+        delta_zx_s=-3.310565371463973e-11 + 2.4160609657083637e-09j,
+        delta_zx_d=-3.5075801360800885 + 4.1074084233644336e-14j,
+        delta_perp_z=-63.513372199351885 + 4.1920631483844906e-13j,
+        delta_perp_x=-10.177855352139929 - 1.7339087624688947e-14j,
     )
 
 

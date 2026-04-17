@@ -9,7 +9,10 @@ def test_round2_projection_smoke() -> None:
     sample = load_luo_samples()[0]
     projected = project_luo_sample_to_round2_channels(sample)
     assert projected.projected_physical_channels is not None
+    assert projected.round2_projection_metadata["anchor_channel"] == "delta_zz_s"
     assert projected.round2_projection_metrics["retained_ratio_total"] > 0.0
 
-    _, _, comparison = summarize_round2_projection(max_samples=8)
+    _, round2_summary, comparison = summarize_round2_projection(max_samples=8)
+    assert round2_summary["baseline_cluster_summary"]["num_samples"] == 8
+    assert round2_summary["optional_channel_relative_scale"]["median"] < 1.0e-3
     assert comparison["retained_ratio_improvement"]["median"] >= -1.0e-10

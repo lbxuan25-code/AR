@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import numpy as np
 
+from core.conventions import CORE_PHYSICAL_PAIRING_CHANNELS, OPTIONAL_PHYSICAL_PAIRING_CHANNELS
 from core.pairing import delta_matrix, physical_channels_from_pairing
 from core.parameters import PairingParams, PhysicalPairingChannels
+from core.presets import base_physical_pairing_channels, compatibility_physical_pairing_channels
 
 
 def test_round2_physical_channels_preserve_legacy_pairing_matrix() -> None:
@@ -37,3 +39,14 @@ def test_round2_pairing_matrix_uses_new_channels() -> None:
     assert np.isclose(matrix[0, 1], 10.0)
     assert np.isclose(matrix[0, 2], 7.0)
     assert np.isclose(matrix[1, 3], 8.0)
+
+
+def test_formal_round2_channel_groups_and_baseline() -> None:
+    assert OPTIONAL_PHYSICAL_PAIRING_CHANNELS == ("delta_zx_s",)
+    assert "delta_zx_s" not in CORE_PHYSICAL_PAIRING_CHANNELS
+
+    formal = base_physical_pairing_channels()
+    compatibility = compatibility_physical_pairing_channels()
+    assert abs(formal.delta_perp_x) > 1.0
+    assert abs(formal.delta_zx_d) > 1.0
+    assert not np.isclose(formal.delta_perp_z, compatibility.delta_perp_z)
