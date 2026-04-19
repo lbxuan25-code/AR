@@ -1,0 +1,224 @@
+# TODO
+
+## Current Task
+
+### Task B — Make the projection AR-aware
+
+Upgrade the current weighted-ridge projection so it can emphasize source components that matter most for final AR spectra.
+
+#### Implement
+- Keep the current block-weight + ridge + gauge-fix path as the baseline.
+- Add an optional AR-relevance weighting layer, for example:
+  - higher weight on source entries/channels that dominate `Delta(k)` near important Fermi-surface contours
+  - lower weight on weak/noisy entries that do not visibly affect AR
+- Keep the code modular so the repository can compare:
+  - current round-2 weighted ridge
+  - AR-aware weighted ridge
+
+#### Deliverables
+- updated projection config / code path
+- comparison summary showing effects on:
+  - retained ratio
+  - residual norm
+  - projected-channel stability
+  - spectral agreement on representative samples
+
+#### Acceptance
+Task B is complete only if AR-aware weighting is either:
+- measurably better than the current default, or
+- explicitly shown not to help.
+
+---
+
+## Backlog
+
+### Task C — Freeze the weak optional channel by default
+Treat `delta_zx_s` as a weak optional channel in the default truth-layer workflow.
+
+#### Implement
+- Keep code support for `delta_zx_s`
+- In the default baseline / projection workflow:
+  - strongly regularize it
+  - keep it effectively frozen unless diagnostics show a clear need
+- Make this policy explicit in code and docs
+
+#### Acceptance
+The default truth model is centered on the 7 core channels; `delta_zx_s` remains available but does not drift unnecessarily.
+
+---
+
+### Task D — Spectral validation of the formal round-2 baseline
+Verify what the formal round-2 truth-layer state changes in actual AR spectra.
+
+#### Compare
+- compatibility baseline
+- formal round-2 baseline
+- representative Luo projected samples
+
+#### Scan
+- `interface_angle`
+- `barrier_z`
+- `gamma`
+- `temperature`
+
+#### Deliverables
+- side-by-side spectrum comparisons
+- summary of which spectral features are sensitive to:
+  - `delta_zz_d`
+  - `delta_zx_d`
+  - `delta_perp_x`
+  - formal round-2 baseline vs compatibility baseline
+
+#### Acceptance
+We can state what physical / spectral information the formal round-2 baseline adds beyond the legacy-compatible baseline.
+
+---
+
+### Task E — Sync documentation with the actual Stage-3 implementation
+Bring docs into exact agreement with the current repository state.
+
+#### Update docs to reflect
+- 7 core channels + 1 optional weak channel
+- weighted ridge + global gauge fix projection
+- formal round-2 baseline from the low-temperature charge-balanced Luo cluster
+- unified projection metrics
+- current limitation: better than round-1, but still not full-RMFT-equivalent
+
+#### Acceptance
+A new developer or Codex can read the docs and understand the current pairing-state design without reverse-engineering the code.
+
+---
+
+### Task F — Workspace cleanup / decontamination
+Remove obsolete modified content so no stale version can pollute future work.
+
+#### Hard rule
+After cleanup, the workspace must contain **one authoritative implementation path** for the current round-2 truth layer.
+
+#### Implement
+- Delete or rewrite superseded files from earlier iterations if they are no longer part of the current path
+- Remove duplicate scripts / docs / outputs that describe older behavior
+- Remove temporary files, backups, scratch notebooks, debug scripts, and obsolete generated artifacts
+- In `outputs/`, keep only artifacts that are:
+  - produced by the current implementation
+  - referenced by current docs/tests
+  - or explicitly needed as current-stage diagnostics
+- In `docs/`, keep only documents matching the current implementation
+- Keep compatibility code only if it is still required by current workflow/tests
+
+#### Deliverables
+- cleanup summary listing:
+  - deleted files
+  - rewritten files
+  - intentionally preserved compatibility files and why they remain
+
+#### Acceptance
+No stale modified content remains that could plausibly mislead future coding decisions.
+
+---
+
+## Archive
+
+### Task A — Residual anatomy audit
+Completed.
+
+#### Goal
+Find out exactly what source information is still not captured by the current round-2 pairing truth layer.
+
+#### Completed items
+- added round-2 residual anatomy diagnostics with:
+  - `delta_x`, `delta_y`, `delta_z` block summaries
+  - matrix-entry residual hotspot tables
+  - channel-group summaries (`zz`, `xx`, `zx`, `perp`, plus residual `other`)
+- saved representative best / median / worst samples
+- generated residual heatmap outputs for aggregate and representative cases
+- added a short docs note explaining the dominant residual pattern
+- determined that the remaining mismatch is more likely dominated by missing channel structure than by the current projection weighting
+
+#### Deliverables
+- `outputs/source/round2_residual_anatomy_summary.json`
+- `outputs/source/round2_residual_examples.csv`
+- `outputs/source/round2_residual_anatomy_heatmaps.png`
+- `outputs/source/round2_residual_representatives.png`
+- `docs/round2_residual_anatomy.md`
+
+#### Result
+The repository now has a verified residual-anatomy audit for the current round-2 truth layer, and future projection work can target the actual residual hotspots rather than guessing broadly.
+
+### Stage_1 — Independent AR physics repository
+Completed.
+
+#### Goal
+Build a clean standalone repository for the LNO327 AR project, separate from the old workflow.
+
+#### Completed items
+- established the new repository structure around:
+  - physics core
+  - source bridge
+  - dataset builder
+  - surrogate training path
+  - surrogate-assisted inverse path
+- implemented the baseline normal-state + pairing + BTK forward workflow
+- ensured the repository can produce AR spectra from `ModelParams`
+- established the rule that physics forward is the truth chain; surrogate is only an accelerator
+
+#### Result
+The project has a functioning standalone physics-forward backbone.
+
+---
+
+### Stage_2 — Luo source bridge and round-1 projection audit
+Completed.
+
+#### Goal
+Connect Luo RMFT data to the new repository and verify the meaning of the round-1 source projection.
+
+#### Completed items
+- inspected Luo source structure and identified the relevant RMFT observables
+- established the source language:
+  - `delta_x`
+  - `delta_y`
+  - `delta_z`
+- checked basis / semantics / units consistency between Luo source and local repository
+- implemented and audited round-1 projection
+- proved that round-1 retained-channel formulas were implemented correctly
+- proved that round-1 was only a restricted approximation, not a full RMFT-equivalent projection
+
+#### Result
+The source bridge is in place, and the project has a clear understanding of why round-1 loses information.
+
+---
+
+### Stage_3 — Round-2 order-parameter refactor
+Completed as the current baseline refactor stage.
+
+#### Goal
+Replace the restricted round-1 local pairing language with a more physical round-2 truth-layer channel language that still feeds the existing BTK workflow.
+
+#### Completed items
+- introduced `PhysicalPairingChannels`
+- adopted the 8-channel round-2 language:
+  - `delta_zz_s`
+  - `delta_zz_d`
+  - `delta_xx_s`
+  - `delta_xx_d`
+  - `delta_zx_s`
+  - `delta_zx_d`
+  - `delta_perp_z`
+  - `delta_perp_x`
+- formalized the split:
+  - 7 core channels
+  - 1 optional weak channel (`delta_zx_s`)
+- updated `pairing.py` so the round-2 channels build the final `Delta(k)` used by BTK
+- preserved compatibility with legacy `PairingParams`
+- replaced hand-picked source projection with full-tensor round-2 fitting
+- upgraded the fit to weighted ridge + global gauge fix
+- unified projection metrics
+- built a formal round-2 baseline from the low-temperature charge-balanced Luo cluster
+- verified that round-2 channels can run through the current BTK forward pipeline
+
+#### Result
+The repository now has a usable round-2 pairing truth layer integrated into the physics pipeline.
+
+#### Limitation inherited from Stage_3
+Round-2 is clearly better than round-1, but the improvement is still modest. That is why the next work starts with residual anatomy before any further projection, baseline, or cleanup changes.
