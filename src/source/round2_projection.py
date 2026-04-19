@@ -7,8 +7,12 @@ from functools import lru_cache
 
 import numpy as np
 
+from core.parameters import ModelParams
+from core.pipeline import SpectroscopyPipeline
 from core.conventions import CORE_PHYSICAL_PAIRING_CHANNELS, OPTIONAL_PHYSICAL_PAIRING_CHANNELS, PHYSICAL_PAIRING_CHANNELS
 from core.parameters import PhysicalPairingChannels
+from core.presets import base_normal_state_params
+from core.simulation_model import SimulationModel
 
 from .luo_projection import EV_TO_MEV
 from .projection_metrics import build_projection_metric_bundle
@@ -26,8 +30,13 @@ class Round2ProjectionConfig:
     weight_x: float = 1.0
     weight_y: float = 1.0
     weight_z: float = 1.15
+    source_entry_weight_mode: str = "uniform"
     gauge_anchor_priority: tuple[str, ...] = ROUND2_CORE_CHANNEL_NAMES + ROUND2_OPTIONAL_CHANNEL_NAMES
     gauge_min_anchor_abs: float = 1.0e-10
+    ar_interface_angles: tuple[float, ...] = (0.0, 0.7853981633974483)
+    ar_reference_nk: int = 61
+    ar_supported_entry_weight_floor: float = 0.75
+    ar_unsupported_entry_weight: float = 0.15
     channel_regularization: dict[str, float] = field(
         default_factory=lambda: {
             "delta_zz_s": 1.0e-4,
@@ -57,6 +66,11 @@ class Round2ProjectionConfig:
                 "delta_y": float(self.weight_y),
                 "delta_z": float(self.weight_z),
             },
+            "source_entry_weight_mode": self.source_entry_weight_mode,
+            "ar_interface_angles": [float(value) for value in self.ar_interface_angles],
+            "ar_reference_nk": int(self.ar_reference_nk),
+            "ar_supported_entry_weight_floor": float(self.ar_supported_entry_weight_floor),
+            "ar_unsupported_entry_weight": float(self.ar_unsupported_entry_weight),
             "channel_regularization": {
                 name: float(self.channel_regularization.get(name, 0.0))
                 for name in ROUND2_CHANNEL_NAMES
@@ -139,6 +153,89 @@ def round2_basis_tensors() -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray
 def _round2_design_matrix() -> np.ndarray:
     basis = round2_basis_tensors()
     return np.column_stack([flatten_source_tensors(*basis[name]) for name in ROUND2_CHANNEL_NAMES])
+
+
+def _unit_channel_state(channel_name: str) -> PhysicalPairingChannels:
+    values = {name: 0.0 + 0.0j for name in ROUND2_CHANNEL_NAMES}
+    values[channel_name] = 1.0 + 0.0j
+    return PhysicalPairingChannels(**values)
+
+
+@lru_cache(maxsize=8)
+def _ar_channel_relevance_scores(
+    interface_angles: tuple[float, ...],
+    nk: int,
+) -> tuple[float, ...]:
+    """Return channel relevance scores from interface-gap diagnostics.
+
+    The scores are sample-independent and are anchored to the current baseline
+    normal state. They rank how strongly each round-2 channel contributes to the
+    projected gaps that later feed the AR / BTK workflow.
+    """
+
+    normal_state = base_normal_state_params()
+    scores: list[float] = []
+    for channel_name in ROUND2_CHANNEL_NAMES:
+        model = SimulationModel(
+            params=ModelParams(normal_state=normal_state, pairing=_unit_channel_state(channel_name)),
+            name=f"ar_relevance::{channel_name}",
+        )
+        pipeline = SpectroscopyPipeline(model=model)
+        angle_scores: list[float] = []
+        for interface_angle in interface_angles:
+            diagnostics = pipeline.interface_gap_diagnostics(interface_angle=float(interface_angle), nk=int(nk))
+            contour_values: list[float] = []
+            for contour in diagnostics.contours:
+                if len(contour.abs_delta_plus) == 0:
+                    continue
+                contour_values.append(float(np.mean(contour.abs_delta_plus)))
+                contour_values.append(float(np.mean(contour.abs_delta_minus)))
+            if contour_values:
+                angle_scores.append(float(np.mean(contour_values)))
+        scores.append(float(np.mean(angle_scores)) if angle_scores else 0.0)
+
+    arr = np.asarray(scores, dtype=np.float64)
+    positive = arr[arr > 0.0]
+    scale = float(np.mean(positive)) if positive.size > 0 else 1.0
+    normalized = np.where(arr > 0.0, arr / scale, 1.0)
+    return tuple(float(value) for value in normalized)
+
+
+def source_entry_weight_vector(
+    config: Round2ProjectionConfig = DEFAULT_ROUND2_PROJECTION_CONFIG,
+) -> np.ndarray:
+    """Return row weights on source-tensor entries for the current config."""
+
+    if config.source_entry_weight_mode == "uniform":
+        return np.ones(48, dtype=np.float64)
+    if config.source_entry_weight_mode != "ar_aware":
+        raise ValueError(
+            f"Unsupported source_entry_weight_mode {config.source_entry_weight_mode!r}. "
+            "Expected 'uniform' or 'ar_aware'."
+        )
+
+    basis = round2_basis_tensors()
+    channel_scores = _ar_channel_relevance_scores(tuple(config.ar_interface_angles), int(config.ar_reference_nk))
+    block_vectors: list[np.ndarray] = []
+    for block_index in range(3):
+        support_mask = np.zeros((4, 4), dtype=bool)
+        raw_weights = np.zeros((4, 4), dtype=np.float64)
+        for channel_name, channel_score in zip(ROUND2_CHANNEL_NAMES, channel_scores, strict=True):
+            basis_matrix = np.asarray(basis[channel_name][block_index], dtype=np.complex128)
+            raw_weights += float(channel_score) * np.abs(basis_matrix)
+            support_mask |= np.abs(basis_matrix) > 0.0
+        block_weights = np.full((4, 4), float(config.ar_unsupported_entry_weight), dtype=np.float64)
+        if np.any(support_mask):
+            support_values = raw_weights[support_mask]
+            scale = float(np.mean(support_values)) if np.mean(support_values) > 0.0 else 1.0
+            normalized = raw_weights / scale
+            normalized[support_mask] = np.maximum(
+                normalized[support_mask],
+                float(config.ar_supported_entry_weight_floor),
+            )
+            block_weights[support_mask] = normalized[support_mask]
+        block_vectors.append(block_weights.reshape(-1))
+    return np.concatenate(block_vectors)
 
 
 def _weighted_overlap_coefficient(
@@ -251,13 +348,15 @@ def fit_round2_channels_with_metadata(
     target = flatten_source_tensors(gauge_x, gauge_y, gauge_z)
     design = _round2_design_matrix()
 
-    weights = np.concatenate(
+    block_weights = np.concatenate(
         [
             np.full(delta_x.size, np.sqrt(config.weight_x), dtype=np.float64),
             np.full(delta_y.size, np.sqrt(config.weight_y), dtype=np.float64),
             np.full(delta_z.size, np.sqrt(config.weight_z), dtype=np.float64),
         ]
-    ).astype(np.complex128)
+    )
+    entry_weights = source_entry_weight_vector(config=config)
+    weights = np.sqrt(block_weights * entry_weights).astype(np.complex128)
     weighted_target = weights * target
     weighted_design = weights[:, None] * design
 
@@ -273,7 +372,26 @@ def fit_round2_channels_with_metadata(
     metadata = {
         **gauge_metadata,
         "config": config.to_dict(),
-        "fit_mode": "weighted_ridge_with_global_gauge_fix",
+        "source_entry_weight_stats": {
+            "min": float(np.min(entry_weights)),
+            "max": float(np.max(entry_weights)),
+            "mean": float(np.mean(entry_weights)),
+        },
+        "ar_channel_relevance_scores": {
+            name: score
+            for name, score in zip(
+                ROUND2_CHANNEL_NAMES,
+                _ar_channel_relevance_scores(tuple(config.ar_interface_angles), int(config.ar_reference_nk)),
+                strict=True,
+            )
+        }
+        if config.source_entry_weight_mode == "ar_aware"
+        else {},
+        "fit_mode": (
+            "weighted_ridge_with_global_gauge_fix_and_ar_entry_weights"
+            if config.source_entry_weight_mode == "ar_aware"
+            else "weighted_ridge_with_global_gauge_fix"
+        ),
     }
     return channels, metadata
 

@@ -2,37 +2,8 @@
 
 ## Current Task
 
-### Task B — Make the projection AR-aware
-
-Upgrade the current weighted-ridge projection so it can emphasize source components that matter most for final AR spectra.
-
-#### Implement
-- Keep the current block-weight + ridge + gauge-fix path as the baseline.
-- Add an optional AR-relevance weighting layer, for example:
-  - higher weight on source entries/channels that dominate `Delta(k)` near important Fermi-surface contours
-  - lower weight on weak/noisy entries that do not visibly affect AR
-- Keep the code modular so the repository can compare:
-  - current round-2 weighted ridge
-  - AR-aware weighted ridge
-
-#### Deliverables
-- updated projection config / code path
-- comparison summary showing effects on:
-  - retained ratio
-  - residual norm
-  - projected-channel stability
-  - spectral agreement on representative samples
-
-#### Acceptance
-Task B is complete only if AR-aware weighting is either:
-- measurably better than the current default, or
-- explicitly shown not to help.
-
----
-
-## Backlog
-
 ### Task C — Freeze the weak optional channel by default
+
 Treat `delta_zx_s` as a weak optional channel in the default truth-layer workflow.
 
 #### Implement
@@ -46,6 +17,8 @@ Treat `delta_zx_s` as a weak optional channel in the default truth-layer workflo
 The default truth model is centered on the 7 core channels; `delta_zx_s` remains available but does not drift unnecessarily.
 
 ---
+
+## Backlog
 
 ### Task D — Spectral validation of the formal round-2 baseline
 Verify what the formal round-2 truth-layer state changes in actual AR spectra.
@@ -118,6 +91,31 @@ No stale modified content remains that could plausibly mislead future coding dec
 ---
 
 ## Archive
+
+### Task B — Make the projection AR-aware
+Completed.
+
+#### Goal
+Upgrade the current weighted-ridge projection so it can emphasize source components that matter most for final AR spectra.
+
+#### Completed items
+- added an optional AR-aware source-entry weighting mode on top of the existing block-weight + ridge + gauge-fix projection
+- derived AR relevance scores from interface-gap diagnostics of unit round-2 channels on the baseline normal state
+- kept the default weighted-ridge path intact while making the AR-aware path explicitly configurable
+- built a comparison diagnostic that measures:
+  - retained ratio
+  - residual norm
+  - projected-channel stability
+  - representative-sample BTK spectral agreement against a source-tensor reference model
+- explicitly tested whether AR-aware weighting helps relative to the current default
+
+#### Deliverables
+- `outputs/source/ar_aware_projection_comparison_summary.json`
+- `outputs/source/ar_aware_projection_examples.csv`
+- `outputs/source/ar_aware_projection_representative_spectra.png`
+
+#### Result
+AR-aware entry weighting was explicitly shown not to materially help relative to the current default weighted-ridge projection path, so the repository keeps the existing default as the authoritative projection baseline.
 
 ### Task A — Residual anatomy audit
 Completed.
