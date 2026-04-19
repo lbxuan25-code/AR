@@ -52,13 +52,26 @@ Stage 3 projection now performs:
 Regularization strengths are intentionally weakest on the main channels and
 strongest on the optional weak mixed channel:
 
-- `delta_zx_s`: `5.0e-3`
+- `delta_zx_s`: `5.0e-3`, followed by a default soft-freeze decision gate
 - `delta_zx_d`, `delta_perp_x`: `7.5e-4`
 - `delta_zz_s`, `delta_xx_s`, `delta_xx_d`, `delta_perp_z`: `1.0e-4`
 - `delta_zz_d`: `2.0e-4`
 
 The global gauge reference is chosen from the prioritized core-channel list.
 On the current Luo source cache, the anchor is always `delta_zz_s`.
+
+Task C default policy further treats `delta_zx_s` as a weak optional channel:
+
+- the code still supports it,
+- the full fit is still computed,
+- but the default workflow keeps it frozen at zero unless it clears a
+  "clear need" gate:
+  - relative magnitude at least `8e-2` compared with the strongest core channel
+  - residual-norm reduction at least `1e-2` when compared against the
+    frozen-channel refit
+
+So the default truth model is now explicitly centered on the 7 core channels,
+while `delta_zx_s` remains available for non-default diagnostic runs.
 
 ## Unified Metrics
 
@@ -108,17 +121,18 @@ is consistent with its Stage-3 optional status.
 
 ## Current Diagnostics
 
-After regenerating the Stage-3 outputs:
+After regenerating the current round-2 outputs with the Task C freeze gate:
 
 - round-1 median retained ratio total: `0.34670871724588614`
-- round-2 median retained ratio total: `0.3663039873777887`
-- median retained-ratio improvement: `0.021717295284400362`
+- round-2 median retained ratio total: `0.36607361367472413`
+- median retained-ratio improvement: `0.02148692035546879`
 - round-1 median residual norm total: `59.27361303524721`
-- round-2 median residual norm total: `54.48865949773044`
-- median optional/core scale ratio: `7.484002112733298e-06`
+- round-2 median residual norm total: `54.63856967656513`
+- median optional/core scale ratio: `0.0` after the default freeze gate
+- default optional-channel frozen fraction: `0.98157694582946`
 
-So Stage 3 keeps the round-2 reconstruction improvement over round 1 and also
-makes the weak mixed channel numerically well controlled.
+So the repository still keeps a modest round-2 improvement over round 1, while
+the weak mixed channel is now explicitly suppressed in the default workflow.
 
 ## Truth Layer vs Fit Layer
 

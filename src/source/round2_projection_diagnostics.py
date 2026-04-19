@@ -203,6 +203,8 @@ def summarize_round2_projection(
 
     gauge_anchor_names = [item["round2_metadata"]["anchor_channel"] for item in per_sample]
     unique_anchor_names = sorted(set(gauge_anchor_names))
+    optional_policy_rows = [item["round2_metadata"].get("optional_channel_policy", {}) for item in per_sample]
+    activated_mask = np.asarray([bool(row.get("activated", True)) for row in optional_policy_rows], dtype=np.bool_)
     round2_summary = {
         "num_samples": len(per_sample),
         "metric_definition": {
@@ -223,6 +225,17 @@ def summarize_round2_projection(
             for name in ROUND2_CHANNEL_NAMES
         },
         "optional_channel_relative_scale": _real_stats(np.asarray([item["optional_to_core_ratio"] for item in per_sample])),
+        "optional_channel_policy_summary": {
+            "mode": optional_policy_rows[0].get("mode", "not_recorded") if optional_policy_rows else "not_recorded",
+            "activation_fraction": float(np.mean(activated_mask.astype(np.float64))) if activated_mask.size else 0.0,
+            "frozen_fraction": float(np.mean((~activated_mask).astype(np.float64))) if activated_mask.size else 0.0,
+            "relative_magnitude_if_full_fit": _real_stats(
+                np.asarray([float(row.get("relative_magnitude", 0.0)) for row in optional_policy_rows], dtype=np.float64)
+            ),
+            "residual_reduction_if_activated": _real_stats(
+                np.asarray([float(row.get("residual_reduction_if_activated", 0.0)) for row in optional_policy_rows], dtype=np.float64)
+            ),
+        },
         "gauge_anchor_stats": {
             name: gauge_anchor_names.count(name)
             for name in unique_anchor_names

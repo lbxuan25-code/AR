@@ -33,6 +33,10 @@ class Round2ProjectionConfig:
     source_entry_weight_mode: str = "uniform"
     gauge_anchor_priority: tuple[str, ...] = ROUND2_CORE_CHANNEL_NAMES + ROUND2_OPTIONAL_CHANNEL_NAMES
     gauge_min_anchor_abs: float = 1.0e-10
+    freeze_optional_weak_channel_by_default: bool = True
+    optional_weak_channel_name: str = "delta_zx_s"
+    optional_channel_activation_min_relative_magnitude: float = 8.0e-2
+    optional_channel_activation_min_residual_reduction: float = 1.0e-2
     ar_interface_angles: tuple[float, ...] = (0.0, 0.7853981633974483)
     ar_reference_nk: int = 61
     ar_supported_entry_weight_floor: float = 0.75
@@ -67,6 +71,10 @@ class Round2ProjectionConfig:
                 "delta_z": float(self.weight_z),
             },
             "source_entry_weight_mode": self.source_entry_weight_mode,
+            "freeze_optional_weak_channel_by_default": bool(self.freeze_optional_weak_channel_by_default),
+            "optional_weak_channel_name": self.optional_weak_channel_name,
+            "optional_channel_activation_min_relative_magnitude": float(self.optional_channel_activation_min_relative_magnitude),
+            "optional_channel_activation_min_residual_reduction": float(self.optional_channel_activation_min_residual_reduction),
             "ar_interface_angles": [float(value) for value in self.ar_interface_angles],
             "ar_reference_nk": int(self.ar_reference_nk),
             "ar_supported_entry_weight_floor": float(self.ar_supported_entry_weight_floor),
@@ -238,6 +246,28 @@ def source_entry_weight_vector(
     return np.concatenate(block_vectors)
 
 
+def _fit_channels_from_weighted_design(
+    weighted_design: np.ndarray,
+    weighted_target: np.ndarray,
+    config: Round2ProjectionConfig,
+    active_channel_names: tuple[str, ...] = ROUND2_CHANNEL_NAMES,
+) -> PhysicalPairingChannels:
+    """Solve the weighted ridge fit for the selected active channels."""
+
+    active_indices = [ROUND2_CHANNEL_NAMES.index(name) for name in active_channel_names]
+    reduced_design = weighted_design[:, active_indices]
+    regularization = config.regularization_vector()[active_indices]
+    augmented_design = np.vstack([reduced_design, np.diag(np.sqrt(regularization)).astype(np.complex128)])
+    augmented_target = np.concatenate(
+        [weighted_target, np.zeros(len(active_channel_names), dtype=np.complex128)]
+    )
+    solution, _, _, _ = np.linalg.lstsq(augmented_design, augmented_target, rcond=None)
+    values = {name: 0.0 + 0.0j for name in ROUND2_CHANNEL_NAMES}
+    for index, name in enumerate(active_channel_names):
+        values[name] = complex(solution[index])
+    return PhysicalPairingChannels(**values)
+
+
 def _weighted_overlap_coefficient(
     target_x: np.ndarray,
     target_y: np.ndarray,
@@ -360,15 +390,49 @@ def fit_round2_channels_with_metadata(
     weighted_target = weights * target
     weighted_design = weights[:, None] * design
 
-    regularization = config.regularization_vector()
-    augmented_design = np.vstack([weighted_design, np.diag(np.sqrt(regularization)).astype(np.complex128)])
-    augmented_target = np.concatenate(
-        [weighted_target, np.zeros(len(ROUND2_CHANNEL_NAMES), dtype=np.complex128)]
+    full_channels = _fit_channels_from_weighted_design(
+        weighted_design=weighted_design,
+        weighted_target=weighted_target,
+        config=config,
+        active_channel_names=ROUND2_CHANNEL_NAMES,
     )
-    solution, _, _, _ = np.linalg.lstsq(augmented_design, augmented_target, rcond=None)
-    channels = PhysicalPairingChannels(
-        **{name: complex(solution[index]) for index, name in enumerate(ROUND2_CHANNEL_NAMES)}
-    )
+    channels = full_channels
+    optional_policy_metadata = {
+        "mode": "not_applied",
+        "optional_channel_name": config.optional_weak_channel_name,
+        "activated": True,
+    }
+    if config.freeze_optional_weak_channel_by_default:
+        active_without_optional = tuple(
+            name for name in ROUND2_CHANNEL_NAMES if name != config.optional_weak_channel_name
+        )
+        frozen_channels = _fit_channels_from_weighted_design(
+            weighted_design=weighted_design,
+            weighted_target=weighted_target,
+            config=config,
+            active_channel_names=active_without_optional,
+        )
+        full_metrics = build_projection_metric_bundle(gauge_x, gauge_y, gauge_z, *reconstruct_source_tensors_from_channels(full_channels))
+        frozen_metrics = build_projection_metric_bundle(gauge_x, gauge_y, gauge_z, *reconstruct_source_tensors_from_channels(frozen_channels))
+        optional_abs = abs(getattr(full_channels, config.optional_weak_channel_name))
+        core_abs = max(abs(getattr(full_channels, name)) for name in ROUND2_CORE_CHANNEL_NAMES)
+        relative_magnitude = float(optional_abs / core_abs) if core_abs > 0.0 else 0.0
+        residual_reduction = float(frozen_metrics["residual_norm_total"] - full_metrics["residual_norm_total"])
+        clear_need = (
+            relative_magnitude >= float(config.optional_channel_activation_min_relative_magnitude)
+            and residual_reduction >= float(config.optional_channel_activation_min_residual_reduction)
+        )
+        channels = full_channels if clear_need else frozen_channels
+        optional_policy_metadata = {
+            "mode": "freeze_by_default_soft_gate",
+            "optional_channel_name": config.optional_weak_channel_name,
+            "activated": bool(clear_need),
+            "relative_magnitude": relative_magnitude,
+            "residual_reduction_if_activated": residual_reduction,
+            "activation_min_relative_magnitude": float(config.optional_channel_activation_min_relative_magnitude),
+            "activation_min_residual_reduction": float(config.optional_channel_activation_min_residual_reduction),
+            "selected_fit": "full_channels" if clear_need else "frozen_optional_channel",
+        }
     metadata = {
         **gauge_metadata,
         "config": config.to_dict(),
@@ -387,6 +451,7 @@ def fit_round2_channels_with_metadata(
         }
         if config.source_entry_weight_mode == "ar_aware"
         else {},
+        "optional_channel_policy": optional_policy_metadata,
         "fit_mode": (
             "weighted_ridge_with_global_gauge_fix_and_ar_entry_weights"
             if config.source_entry_weight_mode == "ar_aware"

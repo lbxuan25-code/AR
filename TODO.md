@@ -2,24 +2,6 @@
 
 ## Current Task
 
-### Task C — Freeze the weak optional channel by default
-
-Treat `delta_zx_s` as a weak optional channel in the default truth-layer workflow.
-
-#### Implement
-- Keep code support for `delta_zx_s`
-- In the default baseline / projection workflow:
-  - strongly regularize it
-  - keep it effectively frozen unless diagnostics show a clear need
-- Make this policy explicit in code and docs
-
-#### Acceptance
-The default truth model is centered on the 7 core channels; `delta_zx_s` remains available but does not drift unnecessarily.
-
----
-
-## Backlog
-
 ### Task D — Spectral validation of the formal round-2 baseline
 Verify what the formal round-2 truth-layer state changes in actual AR spectra.
 
@@ -46,6 +28,8 @@ Verify what the formal round-2 truth-layer state changes in actual AR spectra.
 We can state what physical / spectral information the formal round-2 baseline adds beyond the legacy-compatible baseline.
 
 ---
+
+## Backlog
 
 ### Task E — Sync documentation with the actual Stage-3 implementation
 Bring docs into exact agreement with the current repository state.
@@ -91,6 +75,34 @@ No stale modified content remains that could plausibly mislead future coding dec
 ---
 
 ## Archive
+
+### Task C — Freeze the weak optional channel by default
+Completed.
+
+#### Goal
+Treat `delta_zx_s` as a weak optional channel in the default truth-layer workflow.
+
+#### Completed items
+- kept `delta_zx_s` fully supported in the round-2 channel language
+- added a default soft-freeze gate in the projection workflow:
+  - compute the full fit including `delta_zx_s`
+  - compute the refit with `delta_zx_s` frozen to zero
+  - only activate `delta_zx_s` by default if it clears a clear-need threshold in both:
+    - relative magnitude vs the strongest core channel
+    - residual-norm improvement vs the frozen refit
+- recorded the optional-channel decision in projection metadata and summary diagnostics
+- updated the current truth-layer doc to make the weak-channel policy explicit
+- regenerated the round-2 summary outputs under the new default policy
+
+#### Deliverables
+- updated `src/source/round2_projection.py`
+- updated `src/source/round2_projection_diagnostics.py`
+- updated `docs/pairing_state_stage3.md`
+- updated `outputs/source/round2_projection_summary.json`
+- updated `outputs/source/round1_vs_round2_projection_comparison.json`
+
+#### Result
+The default truth model is now explicitly centered on the 7 core channels. On the current Luo source cache, `delta_zx_s` has median `0`, p95 `0`, and baseline value `0`, while still remaining available for non-default diagnostic runs.
 
 ### Task B — Make the projection AR-aware
 Completed.
