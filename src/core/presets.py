@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .formal_baseline import formal_round2_baseline_channels
 from .parameters import ModelParams, NormalStateParams, PairingParams, PhysicalPairingChannels
 
 
@@ -40,8 +41,9 @@ def base_normal_state_params() -> NormalStateParams:
 def base_pairing_params() -> PairingParams:
     """Return the repository-local fixed baseline pairing preset.
 
-    The numerical values are stored as the repository's single formal baseline
-    pairing preset rather than reconstructed from any external provenance path.
+    This is the legacy compatibility baseline for the old round-1 container.
+    The formal round-2 baseline is provided by
+    ``base_physical_pairing_channels()`` instead.
     """
 
     return PairingParams(
@@ -77,22 +79,12 @@ def compatibility_physical_pairing_channels() -> PhysicalPairingChannels:
 def base_physical_pairing_channels() -> PhysicalPairingChannels:
     """Return the formal Stage-3 round-2 truth-layer baseline.
 
-    The values are fixed from the median of the low-temperature charge-balanced
-    Luo temperature-sweep cluster selected in the Stage-3 baseline audit
-    (`temperature_eV <= 1e-3`, `p≈0`, first 8 samples), then passed through the
-    default Task-C weak-channel freeze convention for ``delta_zx_s``.
+    This function is intentionally not a handwritten numerical preset. It reads
+    the single authoritative source-side baseline record generated at
+    ``outputs/source/round2_baseline_selection.json``.
     """
 
-    return PhysicalPairingChannels(
-        delta_zz_s=43.47120957876885 - 5.990118039475453e-16j,
-        delta_zz_d=-6.466862302353316e-08 + 1.2953226292173955e-07j,
-        delta_xx_s=-1.7820360737854513 + 1.2994633925908852e-12j,
-        delta_xx_d=-1.3049740214993564e-07 + 2.5302036891064664e-07j,
-        delta_zx_s=0.0 + 0.0j,
-        delta_zx_d=-3.5075801360800885 + 4.1074084233644336e-14j,
-        delta_perp_z=-63.513372199351885 + 4.1920631483844906e-13j,
-        delta_perp_x=-10.177855352139929 - 1.7339087624688947e-14j,
-    )
+    return formal_round2_baseline_channels()
 
 
 def base_model_params() -> ModelParams:

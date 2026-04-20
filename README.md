@@ -10,9 +10,20 @@ This repository is a greenfield surrogate project for Ni327 AR spectroscopy. It 
 - a surrogate model for `pairing raw params + transport params -> AR spectrum`,
 - and a surrogate-assisted inverse demo.
 
-## Round-1 Scope
+## Current Status
 
-Round 1 only builds the minimum reproducible loop:
+The repository now has a Stage-3 round-2 pairing truth layer on top of the
+original round-1 forward loop. The active physics path is:
+
+`Luo source pairing tensors -> PhysicalPairingChannels -> Delta(k) -> interface diagnostics -> multichannel BTK spectrum`
+
+The round-2 truth layer uses seven core channels plus one optional weak channel
+(`delta_zx_s`). The formal round-2 baseline is sourced from
+`outputs/source/round2_baseline_selection.json`, which is generated from the
+low-temperature charge-balanced Luo cluster and read by
+`core.presets.base_physical_pairing_channels()`.
+
+The original round-1 work still provides the minimum reproducible loop:
 
 1. initialize the repository and baseline configuration;
 2. migrate or reproduce the physics core;
@@ -41,6 +52,10 @@ The project does not claim a single true parameter point from inverse fitting.
 
 ## Baseline Provenance
 
-The baseline normal-state and pairing parameters are migrated from the local
-`LNO327_AR_Phenomenology` repository and documented in
-`docs/greenfield_repo_design.md`.
+The baseline normal-state parameters remain the repository-local fixed normal
+state in `src/core/presets.py`.
+
+The formal round-2 pairing baseline is not handwritten in `presets.py`. It is
+read from the authoritative source-side record
+`outputs/source/round2_baseline_selection.json`; see
+`docs/pairing_state_stage3.md` for the current pairing-state design.

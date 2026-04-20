@@ -9,6 +9,7 @@ import json
 import numpy as np
 
 from core.conventions import CORE_PHYSICAL_PAIRING_CHANNELS, OPTIONAL_PHYSICAL_PAIRING_CHANNELS
+from core.formal_baseline import AUTHORITATIVE_ROUND2_BASELINE_RECORD
 from core.parameters import PhysicalPairingChannels
 
 from .luo_loader import load_luo_samples
@@ -135,6 +136,10 @@ def build_round2_baseline_summary(
     channels = PhysicalPairingChannels(
         **{name: _componentwise_complex_median(channel_values[name]) for name in ROUND2_CHANNEL_NAMES}
     )
+    if config.freeze_optional_weak_channel_by_default and config.optional_weak_channel_name == "delta_zx_s":
+        channel_payload = channels.to_dict()
+        channel_payload["delta_zx_s"] = 0.0 + 0.0j
+        channels = PhysicalPairingChannels(**channel_payload)
 
     temperatures = np.asarray([float(sample.coordinates["temperature_eV"]) for sample in cluster], dtype=np.float64)
     spread = {
@@ -144,10 +149,21 @@ def build_round2_baseline_summary(
         for name in ROUND2_CHANNEL_NAMES
     }
     return channels, {
+        "record_role": "authoritative_formal_round2_baseline",
+        "authoritative_record_path": str(AUTHORITATIVE_ROUND2_BASELINE_RECORD),
         "selection_rule": (
             "temperature sweep RMFT pairing data, charge-balanced p≈0 branch, "
             "temperature_eV <= 1.0e-3, first 8 samples sorted by temperature"
         ),
+        "generation_method": "source-side default round-2 projection, componentwise complex median",
+        "weak_channel_policy": {
+            "channel": "delta_zx_s",
+            "default_task_c_freeze_applied": bool(
+                config.freeze_optional_weak_channel_by_default
+                and config.optional_weak_channel_name == "delta_zx_s"
+            ),
+            "default_value": 0.0 + 0.0j,
+        },
         "num_samples": len(cluster),
         "sample_ids": [sample.sample_id for sample in cluster],
         "temperature_range_eV": {

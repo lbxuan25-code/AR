@@ -95,7 +95,9 @@ This removes the old ambiguity where retained ratio could mean either
 
 ## Formal Round-2 Baseline
 
-`core.presets.base_physical_pairing_channels()` is now a real round-2 baseline,
+`outputs/source/round2_baseline_selection.json` is the single authoritative
+formal round-2 baseline record. `core.presets.base_physical_pairing_channels()`
+reads that record; it is not an independent handwritten numerical preset and is
 not a translated round-1 compatibility baseline.
 
 The baseline is built from the median of an 8-sample Luo reference cluster:
@@ -105,19 +107,24 @@ The baseline is built from the median of an 8-sample Luo reference cluster:
 - temperature window: `temperature_eV <= 1.0e-3`
 - samples used: first 8 points sorted by temperature
 
-The resulting baseline channels are:
+The current numerical channel values live only in the authoritative record and
+are reused by source summaries, presets, forward runs, and Task-D spectral
+validation. The Task-C weak-channel convention is applied in that record, so the
+default formal baseline has `delta_zx_s = 0`.
 
-- `delta_zz_s = 43.47120957876885`
-- `delta_zz_d ≈ 0`
-- `delta_xx_s = -1.7820360737854513`
-- `delta_xx_d ≈ 0`
-- `delta_zx_s ≈ 0`
-- `delta_zx_d = -3.5075801360800885`
-- `delta_perp_z = -63.513372199351885`
-- `delta_perp_x = -10.177855352139929`
+The runtime path is:
 
-The weak channel `delta_zx_s` remains numerically tiny in this baseline, which
-is consistent with its Stage-3 optional status.
+- source-side builder:
+  `scripts/source/build_round2_projection.py`
+- authoritative record:
+  `outputs/source/round2_baseline_selection.json`
+- runtime loader:
+  `src/core/formal_baseline.py`
+- public preset:
+  `core.presets.base_physical_pairing_channels()`
+
+`compatibility_physical_pairing_channels()` remains available only for explicit
+legacy comparison paths. It is not the formal baseline.
 
 ## Current Diagnostics
 
@@ -125,7 +132,7 @@ After regenerating the current round-2 outputs with the Task C freeze gate:
 
 - round-1 median retained ratio total: `0.34670871724588614`
 - round-2 median retained ratio total: `0.36607361367472413`
-- median retained-ratio improvement: `0.02148692035546879`
+- median retained-ratio improvement: `0.021674821882835316`
 - round-1 median residual norm total: `59.27361303524721`
 - round-2 median residual norm total: `54.63856967656513`
 - median optional/core scale ratio: `0.0` after the default freeze gate
@@ -133,6 +140,20 @@ After regenerating the current round-2 outputs with the Task C freeze gate:
 
 So the repository still keeps a modest round-2 improvement over round 1, while
 the weak mixed channel is now explicitly suppressed in the default workflow.
+
+Task-D spectral validation shows that the formal baseline changes BTK spectra
+relative to the legacy-compatible baseline. In the current scan, the strongest
+new spectral levers are `delta_zx_d` and `delta_perp_x`; `delta_zz_d` is
+negligible at the current baseline amplitude.
+
+## Current Limitation
+
+The current round-2 truth layer is better than round 1, but it is still not
+full-RMFT-equivalent. Residual-anatomy diagnostics show that most remaining
+residual weight sits outside the supported round-2 masks, so the current model
+should be described as a physically interpretable restricted projection of the
+RMFT source tensor, not as a lossless representation of the full RMFT pairing
+structure.
 
 ## Truth Layer vs Fit Layer
 

@@ -2,52 +2,70 @@
 
 ## Current Task
 
-### Task E — Sync documentation with the actual Stage-3 implementation
-Bring docs into exact agreement with the current repository state.
-
-#### Update docs to reflect
-- 7 core channels + 1 optional weak channel
-- weighted ridge + global gauge fix projection
-- formal round-2 baseline from the low-temperature charge-balanced Luo cluster
-- unified projection metrics
-- current limitation: better than round-1, but still not full-RMFT-equivalent
-
-#### Acceptance
-A new developer or Codex can read the docs and understand the current pairing-state design without reverse-engineering the code.
+### No active task — awaiting next assignment
+All tasks currently listed in this file have been completed.
 
 ---
 
 ## Backlog
 
-### Task F — Workspace cleanup / decontamination
-Remove obsolete modified content so no stale version can pollute future work.
-
-#### Hard rule
-After cleanup, the workspace must contain **one authoritative implementation path** for the current round-2 truth layer.
-
-#### Implement
-- Delete or rewrite superseded files from earlier iterations if they are no longer part of the current path
-- Remove duplicate scripts / docs / outputs that describe older behavior
-- Remove temporary files, backups, scratch notebooks, debug scripts, and obsolete generated artifacts
-- In `outputs/`, keep only artifacts that are:
-  - produced by the current implementation
-  - referenced by current docs/tests
-  - or explicitly needed as current-stage diagnostics
-- In `docs/`, keep only documents matching the current implementation
-- Keep compatibility code only if it is still required by current workflow/tests
-
-#### Deliverables
-- cleanup summary listing:
-  - deleted files
-  - rewritten files
-  - intentionally preserved compatibility files and why they remain
-
-#### Acceptance
-No stale modified content remains that could plausibly mislead future coding decisions.
+No pending tasks.
 
 ---
 
 ## Archive
+
+### Task F — Workspace cleanup / decontamination
+Completed.
+
+#### Goal
+Remove obsolete modified content so no stale version can pollute future work.
+
+#### Completed items
+- removed superseded round-1 / greenfield docs that no longer describe the current implementation path
+- removed obsolete CLI scripts that generated stale round-1, surrogate, inverse, or non-authoritative source outputs
+- removed obsolete generated outputs under `outputs/dataset`, `outputs/surrogate`, `outputs/inverse`, and old round-1 source diagnostics
+- removed Python bytecode caches under `src/` and `tests/`
+- preserved the single authoritative round-2 truth-layer path:
+  - `scripts/source/build_round2_projection.py`
+  - `outputs/source/round2_baseline_selection.json`
+  - `src/core/formal_baseline.py`
+  - `core.presets.base_physical_pairing_channels()`
+  - `PhysicalPairingChannels -> Delta(k) -> BTK`
+- preserved compatibility code only where it is still covered by current tests or needed by current round-2 comparison diagnostics
+
+#### Deliverables
+- `docs/workspace_cleanup_task_f.md`
+- cleaned `docs/`, `scripts/`, and `outputs/` trees
+
+#### Result
+The workspace now has one authoritative current round-2 truth-layer implementation path, and stale round-1 generated artifacts no longer pollute future coding decisions.
+
+### Task E — Sync documentation with the actual Stage-3 implementation
+Completed.
+
+#### Goal
+Bring docs into exact agreement with the current repository state.
+
+#### Completed items
+- updated `README.md` so the current status points to the Stage-3 round-2 truth layer rather than only the round-1 loop
+- updated `docs/pairing_state_stage3.md` to reflect:
+  - 7 core channels + 1 optional weak channel
+  - weighted reconstruction, channel-wise ridge, and global gauge fixing
+  - the single authoritative formal baseline record
+  - unified projection metrics
+  - Task-D spectral validation conclusions
+  - the limitation that round 2 is better than round 1 but not full-RMFT-equivalent
+- rewrote `docs/order_parameter_refactor_round2.md` to match the actual Stage-3 implementation and point to `docs/pairing_state_stage3.md` as the authoritative design note
+- preserved historical round-1 docs as historical context rather than rewriting them during this task
+
+#### Deliverables
+- `README.md`
+- `docs/pairing_state_stage3.md`
+- `docs/order_parameter_refactor_round2.md`
+
+#### Result
+A new developer can now read the docs and understand the current pairing-state design, baseline provenance, projection metrics, and known limitations without reverse-engineering the code.
 
 ### Task D — Spectral validation of the formal round-2 baseline
 Completed.
