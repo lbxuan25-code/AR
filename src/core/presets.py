@@ -79,7 +79,8 @@ def base_physical_pairing_channels() -> PhysicalPairingChannels:
 
     The values are fixed from the median of the low-temperature charge-balanced
     Luo temperature-sweep cluster selected in the Stage-3 baseline audit
-    (`temperature_eV <= 1e-3`, `p≈0`, first 8 samples).
+    (`temperature_eV <= 1e-3`, `p≈0`, first 8 samples), then passed through the
+    default Task-C weak-channel freeze convention for ``delta_zx_s``.
     """
 
     return PhysicalPairingChannels(
@@ -87,7 +88,7 @@ def base_physical_pairing_channels() -> PhysicalPairingChannels:
         delta_zz_d=-6.466862302353316e-08 + 1.2953226292173955e-07j,
         delta_xx_s=-1.7820360737854513 + 1.2994633925908852e-12j,
         delta_xx_d=-1.3049740214993564e-07 + 2.5302036891064664e-07j,
-        delta_zx_s=-3.310565371463973e-11 + 2.4160609657083637e-09j,
+        delta_zx_s=0.0 + 0.0j,
         delta_zx_d=-3.5075801360800885 + 4.1074084233644336e-14j,
         delta_perp_z=-63.513372199351885 + 4.1920631483844906e-13j,
         delta_perp_x=-10.177855352139929 - 1.7339087624688947e-14j,

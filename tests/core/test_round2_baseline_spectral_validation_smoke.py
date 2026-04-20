@@ -26,4 +26,5 @@ def test_round2_baseline_spectral_validation_smoke(tmp_path) -> None:
     assert "channel_sensitivity" in summary
     assert set(summary["pairing_states"]["representative_samples"]) == {"best", "median", "worst"}
     assert summary["formal_vs_compatibility"]["all_cases"]["num_cases"] == 8
+    assert summary["pairing_states"]["formal_round2_baseline"]["channels"]["delta_zx_s"] == 0.0 + 0.0j
     assert "verdict" in summary

@@ -47,6 +47,7 @@ def test_formal_round2_channel_groups_and_baseline() -> None:
 
     formal = base_physical_pairing_channels()
     compatibility = compatibility_physical_pairing_channels()
+    assert formal.delta_zx_s == 0.0 + 0.0j
     assert abs(formal.delta_perp_x) > 1.0
     assert abs(formal.delta_zx_d) > 1.0
     assert not np.isclose(formal.delta_perp_z, compatibility.delta_perp_z)

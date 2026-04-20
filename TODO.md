@@ -71,6 +71,7 @@ Verify what the formal round-2 truth-layer state changes in actual AR spectra.
   - `delta_perp_x`
 - generated side-by-side spectrum comparison plots plus per-scan quantitative metrics
 - established a quantitative verdict for what the formal round-2 baseline adds beyond the compatibility baseline
+- corrected the spectral validation to use the same default frozen formal baseline as Task C, with `delta_zx_s = 0`
 
 #### Deliverables
 - `outputs/core/round2_baseline_spectral_validation/round2_baseline_spectral_validation_summary.json`
@@ -79,7 +80,7 @@ Verify what the formal round-2 truth-layer state changes in actual AR spectra.
 - `outputs/core/round2_baseline_spectral_validation/round2_channel_sensitivity_scan.png`
 
 #### Result
-The repository now has a verified spectral audit showing that the formal round-2 baseline changes AR spectra relative to the legacy-compatible baseline, with `delta_zx_d` and `delta_perp_x` carrying visible spectral leverage while `delta_zz_d` is negligible at the current baseline amplitude.
+The repository now has a verified spectral audit using the Task-C default frozen formal baseline. It shows that the formal round-2 baseline changes AR spectra relative to the legacy-compatible baseline, with `delta_zx_d` and `delta_perp_x` carrying visible spectral leverage while `delta_zz_d` is negligible at the current baseline amplitude.
 
 ### Task C — Freeze the weak optional channel by default
 Completed.
