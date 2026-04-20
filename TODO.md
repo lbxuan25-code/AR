@@ -2,35 +2,6 @@
 
 ## Current Task
 
-### Task D — Spectral validation of the formal round-2 baseline
-Verify what the formal round-2 truth-layer state changes in actual AR spectra.
-
-#### Compare
-- compatibility baseline
-- formal round-2 baseline
-- representative Luo projected samples
-
-#### Scan
-- `interface_angle`
-- `barrier_z`
-- `gamma`
-- `temperature`
-
-#### Deliverables
-- side-by-side spectrum comparisons
-- summary of which spectral features are sensitive to:
-  - `delta_zz_d`
-  - `delta_zx_d`
-  - `delta_perp_x`
-  - formal round-2 baseline vs compatibility baseline
-
-#### Acceptance
-We can state what physical / spectral information the formal round-2 baseline adds beyond the legacy-compatible baseline.
-
----
-
-## Backlog
-
 ### Task E — Sync documentation with the actual Stage-3 implementation
 Bring docs into exact agreement with the current repository state.
 
@@ -45,6 +16,8 @@ Bring docs into exact agreement with the current repository state.
 A new developer or Codex can read the docs and understand the current pairing-state design without reverse-engineering the code.
 
 ---
+
+## Backlog
 
 ### Task F — Workspace cleanup / decontamination
 Remove obsolete modified content so no stale version can pollute future work.
@@ -75,6 +48,38 @@ No stale modified content remains that could plausibly mislead future coding dec
 ---
 
 ## Archive
+
+### Task D — Spectral validation of the formal round-2 baseline
+Completed.
+
+#### Goal
+Verify what the formal round-2 truth-layer state changes in actual AR spectra.
+
+#### Completed items
+- added a dedicated spectral-validation diagnostic for:
+  - the legacy-compatible baseline
+  - the formal round-2 baseline
+  - representative Luo projected samples
+- scanned the four transport controls:
+  - `interface_angle`
+  - `barrier_z`
+  - `gamma`
+  - `temperature`
+- added formal-baseline channel-ablation checks for:
+  - `delta_zz_d`
+  - `delta_zx_d`
+  - `delta_perp_x`
+- generated side-by-side spectrum comparison plots plus per-scan quantitative metrics
+- established a quantitative verdict for what the formal round-2 baseline adds beyond the compatibility baseline
+
+#### Deliverables
+- `outputs/core/round2_baseline_spectral_validation/round2_baseline_spectral_validation_summary.json`
+- `outputs/core/round2_baseline_spectral_validation/round2_baseline_spectral_validation_metrics.csv`
+- `outputs/core/round2_baseline_spectral_validation/round2_baseline_scan_comparison.png`
+- `outputs/core/round2_baseline_spectral_validation/round2_channel_sensitivity_scan.png`
+
+#### Result
+The repository now has a verified spectral audit showing that the formal round-2 baseline changes AR spectra relative to the legacy-compatible baseline, with `delta_zx_d` and `delta_perp_x` carrying visible spectral leverage while `delta_zz_d` is negligible at the current baseline amplitude.
 
 ### Task C — Freeze the weak optional channel by default
 Completed.
