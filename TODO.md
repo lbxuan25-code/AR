@@ -2,33 +2,6 @@
 
 ## Current Task
 
-### Task I — Prepare the forward repository to serve an external training repository
-#### Goal
-Turn the current repository into a clean forward-physics source for later surrogate / inverse work in a separate repository.
-
-#### Implement
-- Define a stable forward interface:
-  - canonical input schema
-  - canonical output schema
-  - canonical metadata fields
-- Freeze the authoritative baseline / projection / channel conventions used for dataset generation
-- Add minimal forward-facing scripts or callable entry points for:
-  - generating spectra from fit-layer parameters
-  - generating spectra from source-linked round-2 parameters
-- Add version tags / metadata fields so external training runs can record which forward definition they used
-
-#### Deliverables
-- forward API / contract note
-- minimal callable generation interface
-- versioned metadata convention for datasets
-
-#### Acceptance
-Task I is complete only if a separate training repository could call this repository as a stable forward engine without copying its internals.
-
----
-
-## Backlog
-
 ### Task J — Create the new surrogate / inverse repository plan
 #### Goal
 Design the new repository that will host dataset generation orchestration, surrogate training, and inverse training.
@@ -59,6 +32,8 @@ Task J is complete only if the new training repository could be created without 
 
 ---
 
+## Backlog
+
 ### Task K — Reduce historical outputs and keep only decision-relevant diagnostics
 #### Goal
 Further shrink the current repository outputs so they serve current scientific decisions rather than historical process logging.
@@ -83,6 +58,25 @@ Task K is complete only if a new reader can quickly identify the few outputs tha
 ---
 
 ## Archive
+
+### Task I — Prepare the forward repository to serve an external training repository
+
+Completed and verified.
+
+- Added stable public package `forward` with canonical schemas and callable
+  spectrum-generation entry points.
+- Added `FitLayerSpectrumRequest` and
+  `generate_spectrum_from_fit_layer(...)` for Task-H fit-layer controls.
+- Added `SourceRound2SpectrumRequest` and
+  `generate_spectrum_from_source_round2(...)` for Luo samples projected through
+  the default round-2 truth layer.
+- Added CLI entry point `scripts/core/generate_forward_spectrum.py`.
+- Added version tags and canonical metadata fields:
+  `ar_forward_v1`, `ar_forward_input_v1`, `ar_forward_output_v1`, and
+  `round2_physical_channels_task_h_fit_layer_v1`.
+- Generated example payloads under `outputs/core/forward_interface/`.
+- Added `docs/forward_interface_task_i.md` and updated README / Task-H docs.
+- Verified with `PYTHONPATH=src pytest tests -q`.
 
 ### Task H — Define the fit-layer parameterization for AR inversion
 
@@ -130,4 +124,5 @@ Completed and verified.
 - cleaned workspace
 - RMFT-source-reference vs round-2 AR validation is now the main validation axis
 - AR inversion fit-layer parameterization is documented
-- ready to prepare the stable forward interface in Task I
+- stable forward interface is documented and callable
+- ready to plan the separate surrogate / inverse repository in Task J

@@ -177,3 +177,17 @@ reporting:
 - treat weak or near-zero channels as uncertainty-family features, not as
   unconstrained fit knobs;
 - keep truth-layer code separate from future training / inversion machinery.
+
+## Forward-Interface Use
+
+Task I exposes this fit-layer convention through the stable forward interface
+documented in `docs/forward_interface_task_i.md`.
+
+External callers should use:
+
+- `forward.generate_spectrum_from_fit_layer(...)` for Task-H controls;
+- `forward.generate_spectrum_from_source_round2(...)` for Luo samples projected
+  into the round-2 truth layer.
+
+This keeps the fit layer as an inference contract while preserving the current
+forward repository as the source of truth for spectra.

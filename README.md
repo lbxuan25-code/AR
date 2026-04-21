@@ -41,6 +41,11 @@ Task H defines the future AR inversion fit layer in
 control space around the round-2 truth layer: it reports ranked candidate
 families and uncertainty ranges, not a unique microscopic RMFT parameter point.
 
+Task I defines the stable forward interface for a later external training
+repository in `docs/forward_interface_task_i.md`. External callers should use
+the `forward` package or `scripts/core/generate_forward_spectrum.py` rather than
+copying internal normal-state, projection, pairing, interface, or BTK code.
+
 ## Core Principle
 
 The physics forward workflow is the ground-truth path:
