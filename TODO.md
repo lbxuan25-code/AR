@@ -2,32 +2,32 @@
 
 ## Current Task
 
-### Task K — Reduce historical outputs and keep only decision-relevant diagnostics
-#### Goal
-Further shrink the current repository outputs so they serve current scientific decisions rather than historical process logging.
-
-#### Implement
-- demote or remove non-essential historical comparison outputs
-- keep only outputs that are still directly useful for:
-  - source-to-round2 fidelity
-  - round-2 spectral validation
-  - authoritative baseline provenance
-  - forward API correctness
-- produce a compact index of “current important outputs”
-
-#### Deliverables
-- compact output index note
-- reduced outputs tree
-- cleanup summary
-
-#### Acceptance
-Task K is complete only if a new reader can quickly identify the few outputs that matter for current scientific decisions.
+### No active task — awaiting next assignment
+All tasks currently listed in this file have been completed and verified.
 
 ---
 
 ## Backlog
 
 ## Archive
+
+### Task K — Reduce historical outputs and keep only decision-relevant diagnostics
+
+Completed and verified.
+
+- Added `docs/current_output_index_task_k.md` as the compact index of current
+  decision-relevant generated outputs.
+- Added `docs/workspace_cleanup_task_k.md` as the cleanup summary.
+- Removed stale generated AR-aware projection comparison outputs from
+  `outputs/source/`.
+- Removed the superseded baseline-forward demo output directory from
+  `outputs/core/`.
+- Kept current outputs for authoritative baseline provenance,
+  source-to-round2 fidelity, residual anatomy, RMFT-source-reference AR
+  validation, formal round-2 baseline spectral validation, forward-interface
+  examples, and the required Luo source cache.
+- Removed Python bytecode caches after testing.
+- Verified with `PYTHONPATH=src pytest tests -q`.
 
 ### Task J — Create the new surrogate / inverse repository plan
 
@@ -118,4 +118,5 @@ Completed and verified.
 - AR inversion fit-layer parameterization is documented
 - stable forward interface is documented and callable
 - separate surrogate / inverse repository plan is documented
-- ready to reduce historical outputs in Task K
+- compact current output index is documented
+- no pending tasks remain in this TODO

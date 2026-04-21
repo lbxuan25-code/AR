@@ -80,12 +80,16 @@ current source metrics, or current Stage-3 diagnostics:
 - `outputs/source/cache/RMFT_Ni327` because the local source loader and tests
   depend on this cache in a network-restricted environment
 - current round-2 outputs:
-  `round2_baseline_selection`, `round2_projection`, residual anatomy, AR-aware
-  comparison, and Task-D spectral validation outputs
+  `round2_baseline_selection`, `round2_projection`, residual anatomy, and
+  Task-D spectral validation outputs
 
 Task G later replaced the main validation axis with source-reference AR
 fidelity and removed the generated round-1-vs-round-2 comparison artifact from
 the current output set.
+
+Task K later removed the generated AR-aware projection comparison outputs and
+the old baseline-forward demo outputs. The compact current output index is
+`docs/current_output_index_task_k.md`.
 
 ## Result
 

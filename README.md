@@ -46,6 +46,9 @@ repository in `docs/forward_interface_task_i.md`. External callers should use
 the `forward` package or `scripts/core/generate_forward_spectrum.py` rather than
 copying internal normal-state, projection, pairing, interface, or BTK code.
 
+The compact index of currently decision-relevant generated outputs is
+`docs/current_output_index_task_k.md`.
+
 ## Core Principle
 
 The physics forward workflow is the ground-truth path:
