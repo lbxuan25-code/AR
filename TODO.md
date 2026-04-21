@@ -2,38 +2,6 @@
 
 ## Current Task
 
-### Task J — Create the new surrogate / inverse repository plan
-#### Goal
-Design the new repository that will host dataset generation orchestration, surrogate training, and inverse training.
-
-#### Implement
-- Define the split of responsibilities between repositories:
-  - current repository = forward truth chain
-  - new repository = training / inversion / experiment fitting
-- Specify the new repository structure:
-  - dataset orchestration
-  - training
-  - evaluation
-  - inverse search
-  - experiment fitting outputs
-- Define dependency strategy:
-  - use this repository as an external forward dependency
-  - do not duplicate the forward physics code
-- Write the initial task list for the new repository
-
-#### Deliverables
-- new-repository design note
-- initial `AGENTS.md`
-- initial `TODO.md`
-- initial directory plan
-
-#### Acceptance
-Task J is complete only if the new training repository could be created without ambiguity.
-
----
-
-## Backlog
-
 ### Task K — Reduce historical outputs and keep only decision-relevant diagnostics
 #### Goal
 Further shrink the current repository outputs so they serve current scientific decisions rather than historical process logging.
@@ -57,7 +25,31 @@ Task K is complete only if a new reader can quickly identify the few outputs tha
 
 ---
 
+## Backlog
+
 ## Archive
+
+### Task J — Create the new surrogate / inverse repository plan
+
+Completed and verified.
+
+- Added `docs/new_surrogate_inverse_repository_plan.md`.
+- Added future-repository starter templates under
+  `docs/new_surrogate_inverse_repository/`:
+  `AGENTS.md`, `TODO.md`, and `DIRECTORY_PLAN.md`.
+- Defined the repository split:
+  current repository = forward truth chain;
+  future repository = dataset orchestration, surrogate training, inverse search,
+  and experiment fitting.
+- Defined the dependency strategy: the future repository consumes this
+  repository through the stable `forward` package or
+  `scripts/core/generate_forward_spectrum.py` and must not copy forward physics
+  internals.
+- Specified the initial new-repository task sequence and directory ownership
+  plan.
+- Preserved this repository's root `README.md`, `AGENTS.md`, and template-free
+  root files; only this `TODO.md` was minimally updated for task promotion.
+- Verified with `PYTHONPATH=src pytest tests -q`.
 
 ### Task I — Prepare the forward repository to serve an external training repository
 
@@ -125,4 +117,5 @@ Completed and verified.
 - RMFT-source-reference vs round-2 AR validation is now the main validation axis
 - AR inversion fit-layer parameterization is documented
 - stable forward interface is documented and callable
-- ready to plan the separate surrogate / inverse repository in Task J
+- separate surrogate / inverse repository plan is documented
+- ready to reduce historical outputs in Task K
