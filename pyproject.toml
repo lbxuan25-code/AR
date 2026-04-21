@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rmft-guided-surrogate-ar"
+name = "lno327-ar-forward-truth"
 version = "0.1.0"
-description = "Physics-core-first surrogate workflow for pairing-and-transport AR spectra in Ni327."
+description = "Forward-physics truth chain for LNO327 / La3Ni2O7 Andreev-reflection spectra."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

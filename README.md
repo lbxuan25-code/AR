@@ -1,8 +1,8 @@
-# RMFT-Guided Surrogate for Pairing-and-Transport AR Spectra
+# LNO327 AR Forward Truth Chain
 
 ## Project Goal
 
-This repository is the forward-physics truth-chain project for Ni327 AR spectroscopy. It provides:
+This repository is the forward-physics truth-chain project for LNO327 / La3Ni2O7 AR spectroscopy. It provides:
 
 - a reusable physics forward workflow,
 - a bridge from Luo's RMFT source data,

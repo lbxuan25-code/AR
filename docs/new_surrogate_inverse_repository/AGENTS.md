@@ -6,8 +6,8 @@ This future repository will host AR surrogate training, inverse search, and
 experiment-fitting orchestration.
 
 It is not the source of truth for forward physics. The forward truth chain lives
-in the current RMFT-guided forward repository and must be consumed through its
-stable `forward` interface.
+in the LNO327 AR Forward Truth Chain repository and must be consumed through
+its stable `forward` interface.
 
 ## Source Of Truth
 
