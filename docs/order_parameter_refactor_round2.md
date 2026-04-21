@@ -143,3 +143,25 @@ The legacy `PairingParams` API still works through a compatibility conversion
 in `src/core/pairing.py`. That compatibility path is preserved for tests and
 explicit comparisons, but new round-2 forward work should use
 `PhysicalPairingChannels` and the single authoritative formal baseline record.
+
+## Fit-Layer Boundary
+
+Task H defines the AR inversion fit layer in
+`docs/fit_layer_parameterization_task_h.md`. The fit layer is not a replacement
+for `PhysicalPairingChannels`; it is a lower-dimensional inference control
+space around the round-2 truth layer.
+
+Default fit-layer policy:
+
+- free primary pairing controls:
+  `delta_zz_s`, `delta_xx_s`, `delta_zx_d`, `delta_perp_z`,
+  `delta_perp_x`
+- strongly regularized pairing controls:
+  `delta_zz_d`, `delta_xx_d`
+- fixed-by-default weak branch:
+  `delta_zx_s = 0`
+- transport nuisance controls:
+  interface angle, barrier strength, broadening, and temperature policy
+
+Inversion outputs should be ranked candidate families and uncertainty bands,
+not a unique microscopic RMFT point.

@@ -2,46 +2,6 @@
 
 ## Current Task
 
-### Task H — Define the fit-layer parameterization for AR inversion
-#### Goal
-Define the parameter layer that should actually be inferred from experiment.
-
-#### Rationale
-The project goal is to infer the **most likely order-parameter features**, not to claim a unique microscopic RMFT parameter point.
-
-#### Implement
-- Separate clearly:
-  - truth layer = full current round-2 physical channels
-  - fit layer = lower-dimensional inversion control space
-- Decide which quantities are free in the fit layer:
-  - core round-2 pairing channels
-  - weak optional channel policy
-  - transport parameters
-- Decide which quantities should be:
-  - fixed
-  - strongly regularized
-  - reported only as uncertainty bands / candidate families
-- Write the inversion output contract:
-  - candidate clusters
-  - parameter families
-  - confidence-ranked solutions
-  - never a single “true” point claim
-
-#### Deliverables
-- fit-layer design note
-- parameter table with free / fixed / weak / derived fields
-- updated project docs reflecting the truth-layer vs fit-layer split
-
-#### Acceptance
-Task H is complete only if a new developer can answer:
-- what is the truth layer,
-- what is the fit layer,
-- what exactly will be inferred from AR spectra.
-
----
-
-## Backlog
-
 ### Task I — Prepare the forward repository to serve an external training repository
 #### Goal
 Turn the current repository into a clean forward-physics source for later surrogate / inverse work in a separate repository.
@@ -66,6 +26,8 @@ Turn the current repository into a clean forward-physics source for later surrog
 Task I is complete only if a separate training repository could call this repository as a stable forward engine without copying its internals.
 
 ---
+
+## Backlog
 
 ### Task J — Create the new surrogate / inverse repository plan
 #### Goal
@@ -122,6 +84,24 @@ Task K is complete only if a new reader can quickly identify the few outputs tha
 
 ## Archive
 
+### Task H — Define the fit-layer parameterization for AR inversion
+
+Completed and verified.
+
+- Added `docs/fit_layer_parameterization_task_h.md`.
+- Defined the truth layer as the full current round-2 `PhysicalPairingChannels`
+  forward representation with the authoritative formal baseline.
+- Defined the fit layer as a lower-dimensional, gauge-fixed, regularized AR
+  inversion control layer around the formal baseline.
+- Added a parameter table separating free, strongly regularized,
+  fixed-by-default weak, fixed, nuisance, and derived fields.
+- Specified the inversion output contract as ranked candidate families with
+  uncertainty ranges, not a unique microscopic RMFT point.
+- Updated `README.md`, `docs/pairing_state_stage3.md`,
+  `docs/order_parameter_refactor_round2.md`, and
+  `docs/rmft_source_vs_round2_ar_validation.md`.
+- Verified with `PYTHONPATH=src pytest tests -q`.
+
 ### Task G — Rebuild the validation axis around RMFT-source-to-AR fidelity
 
 Completed and verified.
@@ -149,4 +129,5 @@ Completed and verified.
 - one authoritative formal baseline source
 - cleaned workspace
 - RMFT-source-reference vs round-2 AR validation is now the main validation axis
-- ready to define the AR inversion fit layer in Task H
+- AR inversion fit-layer parameterization is documented
+- ready to prepare the stable forward interface in Task I

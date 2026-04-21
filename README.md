@@ -36,6 +36,11 @@ See `docs/rmft_source_vs_round2_ar_validation.md` and
 adequacy check. Round-1 comparisons remain historical / compatibility context
 only.
 
+Task H defines the future AR inversion fit layer in
+`docs/fit_layer_parameterization_task_h.md`. The fit layer is a conservative
+control space around the round-2 truth layer: it reports ranked candidate
+families and uncertainty ranges, not a unique microscopic RMFT parameter point.
+
 ## Core Principle
 
 The physics forward workflow is the ground-truth path:

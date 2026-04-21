@@ -185,14 +185,27 @@ representation of the full RMFT pairing structure.
 
 ## Truth Layer vs Fit Layer
 
-Stage 3 keeps the repository pointed toward a layered design:
+Stage 3 keeps the repository pointed toward a layered design, now made explicit
+by Task H in `docs/fit_layer_parameterization_task_h.md`:
 
 - truth layer:
   the round-2 physical channels with weighted / regularized / gauge-fixed Luo
   projection
 - fit layer:
-  still to be defined later for surrogate / inverse work as a lower-dimensional
-  control space
+  a lower-dimensional AR inversion control space centered on the authoritative
+  round-2 baseline
 
 The key design choice is that fit convenience should not overwrite the physics
 truth layer.
+
+The default fit layer uses gauge-fixed real channel controls around the formal
+baseline. The primary free pairing controls are `delta_zz_s`, `delta_xx_s`,
+`delta_zx_d`, `delta_perp_z`, and `delta_perp_x`. The d-like corrections
+`delta_zz_d` and `delta_xx_d` remain truth-layer channels but are strongly
+regularized in the fit layer. The optional weak `delta_zx_s` channel stays fixed
+to zero by default and only opens a separate candidate-family branch if AR data
+require it.
+
+Fit-layer outputs must be confidence-ranked candidate families with transport
+nuisance parameters and uncertainty ranges, not a single claimed microscopic
+RMFT parameter point.

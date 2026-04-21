@@ -113,3 +113,16 @@ background only. They are not the repository's main validation target. Current
 AR-facing decisions should cite the source-reference AR validation outputs above
 and the round-2 residual-anatomy diagnostics, not old round-1 improvement
 numbers.
+
+## Fit-Layer Implication
+
+Task H uses this validation result to define the AR inversion fit layer in
+`docs/fit_layer_parameterization_task_h.md`. Because round-2 is adequate for the
+current representative AR audit, future inversion should infer feature families
+inside the round-2 channel language rather than trying to infer a full RMFT
+source tensor.
+
+The fit layer remains conservative: low-barrier scans produced the largest
+visible discrepancies, so transport nuisance parameters and weak-channel
+branches must be reported explicitly instead of being folded into a single
+"true" order-parameter claim.
