@@ -2,18 +2,22 @@
 
 ## Project Goal
 
-This repository is a greenfield surrogate project for Ni327 AR spectroscopy. It combines:
+This repository is the forward-physics truth-chain project for Ni327 AR spectroscopy. It provides:
 
 - a reusable physics forward workflow,
 - a bridge from Luo's RMFT source data,
-- a dataset builder that labels samples with the physics forward solver,
-- a surrogate model for `pairing raw params + transport params -> AR spectrum`,
-- and a surrogate-assisted inverse demo.
+- the RMFT-source-to-round-2 projection logic,
+- an authoritative formal round-2 baseline,
+- and AR-facing validation diagnostics.
+
+Large-scale surrogate training, inverse training, checkpoint management, and
+experiment-fitting orchestration are intentionally deferred to a later separate
+training / inversion repository.
 
 ## Current Status
 
-The repository now has a Stage-3 round-2 pairing truth layer on top of the
-original round-1 forward loop. The active physics path is:
+The repository now has a Stage-3 round-2 pairing truth layer. The active physics
+path is:
 
 `Luo source pairing tensors -> PhysicalPairingChannels -> Delta(k) -> interface diagnostics -> multichannel BTK spectrum`
 
@@ -23,14 +27,14 @@ The round-2 truth layer uses seven core channels plus one optional weak channel
 low-temperature charge-balanced Luo cluster and read by
 `core.presets.base_physical_pairing_channels()`.
 
-The original round-1 work still provides the minimum reproducible loop:
+The main validation axis is now:
 
-1. initialize the repository and baseline configuration;
-2. migrate or reproduce the physics core;
-3. inspect and bridge the Luo RMFT source;
-4. build a pairing+transport dataset;
-5. train and evaluate a lightweight surrogate;
-6. run a surrogate-assisted inverse demo.
+`RMFT source-reference AR spectra -> round-2 projected-channel AR spectra`
+
+See `docs/rmft_source_vs_round2_ar_validation.md` and
+`outputs/core/rmft_source_vs_round2_ar_validation/` for the current AR-facing
+adequacy check. Round-1 comparisons remain historical / compatibility context
+only.
 
 ## Core Principle
 
@@ -38,17 +42,8 @@ The physics forward workflow is the ground-truth path:
 
 `ModelParams -> FS / projection / interface diagnostics -> multichannel BTK spectrum`
 
-The surrogate is only an approximator of this workflow and never replaces it.
-
-## Inverse Output Contract
-
-Round-1 inverse outputs must be candidate families rather than a unique truth:
-
-- top-K candidate families,
-- parameter clusters,
-- near-optimal solution sets.
-
-The project does not claim a single true parameter point from inverse fitting.
+Future surrogate or inverse layers must remain downstream approximations of
+this workflow and must not replace the forward truth chain in this repository.
 
 ## Baseline Provenance
 

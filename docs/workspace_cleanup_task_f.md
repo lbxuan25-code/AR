@@ -72,16 +72,20 @@ current source metrics, or current Stage-3 diagnostics:
 
 - `PairingParams` compatibility in `src/core/parameters.py` and `src/core/pairing.py`
 - `compatibility_physical_pairing_channels()` for explicit legacy comparison
-- `src/source/luo_projection.py` because round-1 metrics are still used in
-  current round-1-vs-round-2 comparison diagnostics
+- `src/source/luo_projection.py` because minimal legacy projection metrics are
+  still used by retained compatibility checks
 - `src/data/` and `src/surrogate/` library modules because their smoke tests
   still exercise the legacy accelerator layer; they are not the authoritative
   round-2 truth layer
 - `outputs/source/cache/RMFT_Ni327` because the local source loader and tests
   depend on this cache in a network-restricted environment
 - current round-2 outputs:
-  `round2_baseline_selection`, `round2_projection`, `round1_vs_round2`,
-  residual anatomy, AR-aware comparison, and Task-D spectral validation outputs
+  `round2_baseline_selection`, `round2_projection`, residual anatomy, AR-aware
+  comparison, and Task-D spectral validation outputs
+
+Task G later replaced the main validation axis with source-reference AR
+fidelity and removed the generated round-1-vs-round-2 comparison artifact from
+the current output set.
 
 ## Result
 

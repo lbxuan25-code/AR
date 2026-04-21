@@ -2,257 +2,151 @@
 
 ## Current Task
 
-### No active task — awaiting next assignment
-All tasks currently listed in this file have been completed.
+### Task H — Define the fit-layer parameterization for AR inversion
+#### Goal
+Define the parameter layer that should actually be inferred from experiment.
+
+#### Rationale
+The project goal is to infer the **most likely order-parameter features**, not to claim a unique microscopic RMFT parameter point.
+
+#### Implement
+- Separate clearly:
+  - truth layer = full current round-2 physical channels
+  - fit layer = lower-dimensional inversion control space
+- Decide which quantities are free in the fit layer:
+  - core round-2 pairing channels
+  - weak optional channel policy
+  - transport parameters
+- Decide which quantities should be:
+  - fixed
+  - strongly regularized
+  - reported only as uncertainty bands / candidate families
+- Write the inversion output contract:
+  - candidate clusters
+  - parameter families
+  - confidence-ranked solutions
+  - never a single “true” point claim
+
+#### Deliverables
+- fit-layer design note
+- parameter table with free / fixed / weak / derived fields
+- updated project docs reflecting the truth-layer vs fit-layer split
+
+#### Acceptance
+Task H is complete only if a new developer can answer:
+- what is the truth layer,
+- what is the fit layer,
+- what exactly will be inferred from AR spectra.
 
 ---
 
 ## Backlog
 
-No pending tasks.
+### Task I — Prepare the forward repository to serve an external training repository
+#### Goal
+Turn the current repository into a clean forward-physics source for later surrogate / inverse work in a separate repository.
+
+#### Implement
+- Define a stable forward interface:
+  - canonical input schema
+  - canonical output schema
+  - canonical metadata fields
+- Freeze the authoritative baseline / projection / channel conventions used for dataset generation
+- Add minimal forward-facing scripts or callable entry points for:
+  - generating spectra from fit-layer parameters
+  - generating spectra from source-linked round-2 parameters
+- Add version tags / metadata fields so external training runs can record which forward definition they used
+
+#### Deliverables
+- forward API / contract note
+- minimal callable generation interface
+- versioned metadata convention for datasets
+
+#### Acceptance
+Task I is complete only if a separate training repository could call this repository as a stable forward engine without copying its internals.
+
+---
+
+### Task J — Create the new surrogate / inverse repository plan
+#### Goal
+Design the new repository that will host dataset generation orchestration, surrogate training, and inverse training.
+
+#### Implement
+- Define the split of responsibilities between repositories:
+  - current repository = forward truth chain
+  - new repository = training / inversion / experiment fitting
+- Specify the new repository structure:
+  - dataset orchestration
+  - training
+  - evaluation
+  - inverse search
+  - experiment fitting outputs
+- Define dependency strategy:
+  - use this repository as an external forward dependency
+  - do not duplicate the forward physics code
+- Write the initial task list for the new repository
+
+#### Deliverables
+- new-repository design note
+- initial `AGENTS.md`
+- initial `TODO.md`
+- initial directory plan
+
+#### Acceptance
+Task J is complete only if the new training repository could be created without ambiguity.
+
+---
+
+### Task K — Reduce historical outputs and keep only decision-relevant diagnostics
+#### Goal
+Further shrink the current repository outputs so they serve current scientific decisions rather than historical process logging.
+
+#### Implement
+- demote or remove non-essential historical comparison outputs
+- keep only outputs that are still directly useful for:
+  - source-to-round2 fidelity
+  - round-2 spectral validation
+  - authoritative baseline provenance
+  - forward API correctness
+- produce a compact index of “current important outputs”
+
+#### Deliverables
+- compact output index note
+- reduced outputs tree
+- cleanup summary
+
+#### Acceptance
+Task K is complete only if a new reader can quickly identify the few outputs that matter for current scientific decisions.
 
 ---
 
 ## Archive
 
-### Task F — Workspace cleanup / decontamination
-Completed.
+### Task G — Rebuild the validation axis around RMFT-source-to-AR fidelity
 
-#### Goal
-Remove obsolete modified content so no stale version can pollute future work.
+Completed and verified.
 
-#### Completed items
-- removed superseded round-1 / greenfield docs that no longer describe the current implementation path
-- removed obsolete CLI scripts that generated stale round-1, surrogate, inverse, or non-authoritative source outputs
-- removed obsolete generated outputs under `outputs/dataset`, `outputs/surrogate`, `outputs/inverse`, and old round-1 source diagnostics
-- removed Python bytecode caches under `src/` and `tests/`
-- preserved the single authoritative round-2 truth-layer path:
-  - `scripts/source/build_round2_projection.py`
-  - `outputs/source/round2_baseline_selection.json`
-  - `src/core/formal_baseline.py`
-  - `core.presets.base_physical_pairing_channels()`
-  - `PhysicalPairingChannels -> Delta(k) -> BTK`
-- preserved compatibility code only where it is still covered by current tests or needed by current round-2 comparison diagnostics
+- Added a direct RMFT source-reference AR comparison path against round-2 projected-channel AR spectra.
+- Generated representative best / median / worst sample comparisons over interface angle, barrier strength, broadening, and temperature.
+- Wrote current outputs under `outputs/core/rmft_source_vs_round2_ar_validation/`.
+- Added `docs/rmft_source_vs_round2_ar_validation.md` and updated current docs so the main validation story is no longer round-1-centered.
+- Removed the standalone round-1-vs-round-2 comparison script and generated JSON artifact from the current validation target set while retaining minimal compatibility checks in code/tests.
+- Verified with `PYTHONPATH=src pytest tests -q`.
 
-#### Deliverables
-- `docs/workspace_cleanup_task_f.md`
-- cleaned `docs/`, `scripts/`, and `outputs/` trees
+### Completed previously
+- Stage_1 — Independent forward-physics repository
+- Stage_2 — Luo / RMFT source bridge and round-1 audit
+- Stage_3 — Round-2 order-parameter truth-layer refactor
+- Task A — Residual anatomy audit
+- Task B — AR-aware projection test
+- Task C — Freeze weak optional channel by default
+- Task D — Spectral validation of the formal round-2 baseline
+- Task E — Documentation sync for Stage-3 implementation
+- Task F — Workspace cleanup / decontamination
 
-#### Result
-The workspace now has one authoritative current round-2 truth-layer implementation path, and stale round-1 generated artifacts no longer pollute future coding decisions.
-
-### Task E — Sync documentation with the actual Stage-3 implementation
-Completed.
-
-#### Goal
-Bring docs into exact agreement with the current repository state.
-
-#### Completed items
-- updated `README.md` so the current status points to the Stage-3 round-2 truth layer rather than only the round-1 loop
-- updated `docs/pairing_state_stage3.md` to reflect:
-  - 7 core channels + 1 optional weak channel
-  - weighted reconstruction, channel-wise ridge, and global gauge fixing
-  - the single authoritative formal baseline record
-  - unified projection metrics
-  - Task-D spectral validation conclusions
-  - the limitation that round 2 is better than round 1 but not full-RMFT-equivalent
-- rewrote `docs/order_parameter_refactor_round2.md` to match the actual Stage-3 implementation and point to `docs/pairing_state_stage3.md` as the authoritative design note
-- preserved historical round-1 docs as historical context rather than rewriting them during this task
-
-#### Deliverables
-- `README.md`
-- `docs/pairing_state_stage3.md`
-- `docs/order_parameter_refactor_round2.md`
-
-#### Result
-A new developer can now read the docs and understand the current pairing-state design, baseline provenance, projection metrics, and known limitations without reverse-engineering the code.
-
-### Task D — Spectral validation of the formal round-2 baseline
-Completed.
-
-#### Goal
-Verify what the formal round-2 truth-layer state changes in actual AR spectra.
-
-#### Completed items
-- added a dedicated spectral-validation diagnostic for:
-  - the legacy-compatible baseline
-  - the formal round-2 baseline
-  - representative Luo projected samples
-- scanned the four transport controls:
-  - `interface_angle`
-  - `barrier_z`
-  - `gamma`
-  - `temperature`
-- added formal-baseline channel-ablation checks for:
-  - `delta_zz_d`
-  - `delta_zx_d`
-  - `delta_perp_x`
-- generated side-by-side spectrum comparison plots plus per-scan quantitative metrics
-- established a quantitative verdict for what the formal round-2 baseline adds beyond the compatibility baseline
-- corrected the spectral validation to use the same default frozen formal baseline as Task C, with `delta_zx_s = 0`
-
-#### Deliverables
-- `outputs/core/round2_baseline_spectral_validation/round2_baseline_spectral_validation_summary.json`
-- `outputs/core/round2_baseline_spectral_validation/round2_baseline_spectral_validation_metrics.csv`
-- `outputs/core/round2_baseline_spectral_validation/round2_baseline_scan_comparison.png`
-- `outputs/core/round2_baseline_spectral_validation/round2_channel_sensitivity_scan.png`
-
-#### Result
-The repository now has a verified spectral audit using the Task-C default frozen formal baseline. It shows that the formal round-2 baseline changes AR spectra relative to the legacy-compatible baseline, with `delta_zx_d` and `delta_perp_x` carrying visible spectral leverage while `delta_zz_d` is negligible at the current baseline amplitude.
-
-### Task C — Freeze the weak optional channel by default
-Completed.
-
-#### Goal
-Treat `delta_zx_s` as a weak optional channel in the default truth-layer workflow.
-
-#### Completed items
-- kept `delta_zx_s` fully supported in the round-2 channel language
-- added a default soft-freeze gate in the projection workflow:
-  - compute the full fit including `delta_zx_s`
-  - compute the refit with `delta_zx_s` frozen to zero
-  - only activate `delta_zx_s` by default if it clears a clear-need threshold in both:
-    - relative magnitude vs the strongest core channel
-    - residual-norm improvement vs the frozen refit
-- recorded the optional-channel decision in projection metadata and summary diagnostics
-- updated the current truth-layer doc to make the weak-channel policy explicit
-- regenerated the round-2 summary outputs under the new default policy
-
-#### Deliverables
-- updated `src/source/round2_projection.py`
-- updated `src/source/round2_projection_diagnostics.py`
-- updated `docs/pairing_state_stage3.md`
-- updated `outputs/source/round2_projection_summary.json`
-- updated `outputs/source/round1_vs_round2_projection_comparison.json`
-
-#### Result
-The default truth model is now explicitly centered on the 7 core channels. On the current Luo source cache, `delta_zx_s` has median `0`, p95 `0`, and baseline value `0`, while still remaining available for non-default diagnostic runs.
-
-### Task B — Make the projection AR-aware
-Completed.
-
-#### Goal
-Upgrade the current weighted-ridge projection so it can emphasize source components that matter most for final AR spectra.
-
-#### Completed items
-- added an optional AR-aware source-entry weighting mode on top of the existing block-weight + ridge + gauge-fix projection
-- derived AR relevance scores from interface-gap diagnostics of unit round-2 channels on the baseline normal state
-- kept the default weighted-ridge path intact while making the AR-aware path explicitly configurable
-- built a comparison diagnostic that measures:
-  - retained ratio
-  - residual norm
-  - projected-channel stability
-  - representative-sample BTK spectral agreement against a source-tensor reference model
-- explicitly tested whether AR-aware weighting helps relative to the current default
-
-#### Deliverables
-- `outputs/source/ar_aware_projection_comparison_summary.json`
-- `outputs/source/ar_aware_projection_examples.csv`
-- `outputs/source/ar_aware_projection_representative_spectra.png`
-
-#### Result
-AR-aware entry weighting was explicitly shown not to materially help relative to the current default weighted-ridge projection path, so the repository keeps the existing default as the authoritative projection baseline.
-
-### Task A — Residual anatomy audit
-Completed.
-
-#### Goal
-Find out exactly what source information is still not captured by the current round-2 pairing truth layer.
-
-#### Completed items
-- added round-2 residual anatomy diagnostics with:
-  - `delta_x`, `delta_y`, `delta_z` block summaries
-  - matrix-entry residual hotspot tables
-  - channel-group summaries (`zz`, `xx`, `zx`, `perp`, plus residual `other`)
-- saved representative best / median / worst samples
-- generated residual heatmap outputs for aggregate and representative cases
-- added a short docs note explaining the dominant residual pattern
-- determined that the remaining mismatch is more likely dominated by missing channel structure than by the current projection weighting
-
-#### Deliverables
-- `outputs/source/round2_residual_anatomy_summary.json`
-- `outputs/source/round2_residual_examples.csv`
-- `outputs/source/round2_residual_anatomy_heatmaps.png`
-- `outputs/source/round2_residual_representatives.png`
-- `docs/round2_residual_anatomy.md`
-
-#### Result
-The repository now has a verified residual-anatomy audit for the current round-2 truth layer, and future projection work can target the actual residual hotspots rather than guessing broadly.
-
-### Stage_1 — Independent AR physics repository
-Completed.
-
-#### Goal
-Build a clean standalone repository for the LNO327 AR project, separate from the old workflow.
-
-#### Completed items
-- established the new repository structure around:
-  - physics core
-  - source bridge
-  - dataset builder
-  - surrogate training path
-  - surrogate-assisted inverse path
-- implemented the baseline normal-state + pairing + BTK forward workflow
-- ensured the repository can produce AR spectra from `ModelParams`
-- established the rule that physics forward is the truth chain; surrogate is only an accelerator
-
-#### Result
-The project has a functioning standalone physics-forward backbone.
-
----
-
-### Stage_2 — Luo source bridge and round-1 projection audit
-Completed.
-
-#### Goal
-Connect Luo RMFT data to the new repository and verify the meaning of the round-1 source projection.
-
-#### Completed items
-- inspected Luo source structure and identified the relevant RMFT observables
-- established the source language:
-  - `delta_x`
-  - `delta_y`
-  - `delta_z`
-- checked basis / semantics / units consistency between Luo source and local repository
-- implemented and audited round-1 projection
-- proved that round-1 retained-channel formulas were implemented correctly
-- proved that round-1 was only a restricted approximation, not a full RMFT-equivalent projection
-
-#### Result
-The source bridge is in place, and the project has a clear understanding of why round-1 loses information.
-
----
-
-### Stage_3 — Round-2 order-parameter refactor
-Completed as the current baseline refactor stage.
-
-#### Goal
-Replace the restricted round-1 local pairing language with a more physical round-2 truth-layer channel language that still feeds the existing BTK workflow.
-
-#### Completed items
-- introduced `PhysicalPairingChannels`
-- adopted the 8-channel round-2 language:
-  - `delta_zz_s`
-  - `delta_zz_d`
-  - `delta_xx_s`
-  - `delta_xx_d`
-  - `delta_zx_s`
-  - `delta_zx_d`
-  - `delta_perp_z`
-  - `delta_perp_x`
-- formalized the split:
-  - 7 core channels
-  - 1 optional weak channel (`delta_zx_s`)
-- updated `pairing.py` so the round-2 channels build the final `Delta(k)` used by BTK
-- preserved compatibility with legacy `PairingParams`
-- replaced hand-picked source projection with full-tensor round-2 fitting
-- upgraded the fit to weighted ridge + global gauge fix
-- unified projection metrics
-- built a formal round-2 baseline from the low-temperature charge-balanced Luo cluster
-- verified that round-2 channels can run through the current BTK forward pipeline
-
-#### Result
-The repository now has a usable round-2 pairing truth layer integrated into the physics pipeline.
-
-#### Limitation inherited from Stage_3
-Round-2 is clearly better than round-1, but the improvement is still modest. That is why the next work starts with residual anatomy before any further projection, baseline, or cleanup changes.
+#### Current repository status after those completed tasks
+- one authoritative round-2 forward truth path
+- one authoritative formal baseline source
+- cleaned workspace
+- RMFT-source-reference vs round-2 AR validation is now the main validation axis
+- ready to define the AR inversion fit layer in Task H
