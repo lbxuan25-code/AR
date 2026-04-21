@@ -74,7 +74,7 @@
   },
   "baseline_cluster_summary": {
     "record_role": "authoritative_formal_round2_baseline",
-    "authoritative_record_path": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/source/round2_baseline_selection.json",
+    "authoritative_record_path": "outputs/source/round2_baseline_selection.json",
     "selection_rule": "temperature sweep RMFT pairing data, charge-balanced p\u22480 branch, temperature_eV <= 1.0e-3, first 8 samples sorted by temperature",
     "generation_method": "source-side default round-2 projection, componentwise complex median",
     "weak_channel_policy": {

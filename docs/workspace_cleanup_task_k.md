@@ -34,6 +34,20 @@ Removed historical / non-current generated outputs:
 - `outputs/core/round2_baseline_forward/round2_spectrum.png`
 - empty directory `outputs/core/round2_baseline_forward/`
 
+Removed historical CLI entry points that would regenerate those stale output
+locations:
+
+- `scripts/source/compare_ar_aware_projection.py`
+- `scripts/core/run_round2_baseline_forward.py`
+
+Follow-up forward-interface metadata cleanup also regenerated:
+
+- `outputs/core/forward_interface/fit_layer_example_spectrum.json`
+- `outputs/core/forward_interface/source_round2_example_spectrum.json`
+
+Those examples now use repository-relative baseline metadata and
+`git_dirty = false`.
+
 ## Rationale
 
 The Task-B AR-aware projection comparison remains useful as code-level

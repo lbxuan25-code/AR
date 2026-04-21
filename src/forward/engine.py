@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 from dataclasses import replace
 from pathlib import Path
@@ -34,6 +35,10 @@ from .schema import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
+def _repo_relative_path(path: Path) -> str:
+    return str(Path(path).resolve().relative_to(PROJECT_ROOT))
+
+
 def _git_revision() -> dict[str, object]:
     try:
         commit = subprocess.check_output(
@@ -50,6 +55,8 @@ def _git_revision() -> dict[str, object]:
                 stderr=subprocess.DEVNULL,
             ).strip()
         )
+        if os.environ.get("FORWARD_INTERFACE_CLEAN_METADATA_SNAPSHOT") == "1":
+            dirty = False
         return {"git_commit": commit, "git_dirty": dirty}
     except Exception:
         return {"git_commit": "unknown", "git_dirty": None}
@@ -66,7 +73,7 @@ def _channels_payload(channels: PhysicalPairingChannels) -> dict[str, dict[str, 
 def _baseline_metadata() -> dict[str, object]:
     record = load_authoritative_round2_baseline_record()
     return {
-        "formal_baseline_record": str(AUTHORITATIVE_ROUND2_BASELINE_RECORD),
+        "formal_baseline_record": _repo_relative_path(AUTHORITATIVE_ROUND2_BASELINE_RECORD),
         "formal_baseline_role": record.get("record_role", "authoritative_formal_round2_baseline"),
         "formal_baseline_selection_rule": record.get("selection_rule"),
         "weak_channel_policy": record.get("weak_channel_policy"),

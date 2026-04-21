@@ -25,6 +25,12 @@ from .round2_projection import (
 )
 from .schema import LuoSample
 
+PROJECT_ROOT = AUTHORITATIVE_ROUND2_BASELINE_RECORD.parents[2]
+
+
+def _repo_relative_path(path: Path) -> str:
+    return str(path.resolve().relative_to(PROJECT_ROOT))
+
 
 def _json_ready(value: object) -> object:
     if isinstance(value, complex):
@@ -150,7 +156,7 @@ def build_round2_baseline_summary(
     }
     return channels, {
         "record_role": "authoritative_formal_round2_baseline",
-        "authoritative_record_path": str(AUTHORITATIVE_ROUND2_BASELINE_RECORD),
+        "authoritative_record_path": _repo_relative_path(AUTHORITATIVE_ROUND2_BASELINE_RECORD),
         "selection_rule": (
             "temperature sweep RMFT pairing data, charge-balanced p≈0 branch, "
             "temperature_eV <= 1.0e-3, first 8 samples sorted by temperature"

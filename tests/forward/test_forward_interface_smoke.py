@@ -35,6 +35,7 @@ def test_fit_layer_forward_interface_smoke() -> None:
     assert payload["metadata"]["forward_interface_version"] == FORWARD_INTERFACE_VERSION
     assert payload["metadata"]["pairing_source"] == "task_h_fit_layer_controls"
     assert payload["metadata"]["pairing_convention_id"] == "round2_physical_channels_task_h_fit_layer_v1"
+    assert payload["metadata"]["formal_baseline_record"] == "outputs/source/round2_baseline_selection.json"
     assert payload["pairing_channels"]["delta_zx_s"] == {"re": 0.0, "im": 0.0}
     assert len(payload["bias_mev"]) == 41
     assert len(payload["conductance"]) == 41

@@ -38,6 +38,7 @@ def test_formal_baseline_uses_authoritative_record() -> None:
 
     _assert_channels_match(record_channels, preset_channels)
     _assert_channels_match(record_channels, loader_channels)
+    assert record["authoritative_record_path"] == "outputs/source/round2_baseline_selection.json"
     assert preset_channels["delta_zx_s"] == 0.0 + 0.0j
 
 

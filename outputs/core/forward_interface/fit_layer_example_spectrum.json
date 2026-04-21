@@ -101,7 +101,7 @@
       ],
       "gauge_min_anchor_abs": 1e-10
     },
-    "formal_baseline_record": "/home/liubx25/Ni_Research/Projects/RMFT-guided surrogate for pairing-and-transport AR spectra/outputs/source/round2_baseline_selection.json",
+    "formal_baseline_record": "outputs/source/round2_baseline_selection.json",
     "formal_baseline_role": "authoritative_formal_round2_baseline",
     "formal_baseline_selection_rule": "temperature sweep RMFT pairing data, charge-balanced p\u22480 branch, temperature_eV <= 1.0e-3, first 8 samples sorted by temperature",
     "weak_channel_policy": {
@@ -112,8 +112,8 @@
         "im": 0.0
       }
     },
-    "git_commit": "bc0bc109e888990364e843a1d63b2ba098255785",
-    "git_dirty": true,
+    "git_commit": "051ac208f6fe124adbe0619592007cee7882697d",
+    "git_dirty": false,
     "fit_layer_request_label": "fit-layer",
     "pairing_control_mode": "delta_from_baseline_meV",
     "allow_weak_delta_zx_s": false

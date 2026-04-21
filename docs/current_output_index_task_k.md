@@ -128,6 +128,12 @@ decision targets:
 - `outputs/core/round2_baseline_forward/round2_forward_summary.json`
 - `outputs/core/round2_baseline_forward/round2_spectrum.png`
 
+The old CLI entry points that regenerated those historical output locations
+were also removed:
+
+- `scripts/source/compare_ar_aware_projection.py`
+- `scripts/core/run_round2_baseline_forward.py`
+
 Rationale:
 
 - AR-aware projection comparison was a Task-B exploratory diagnostic and is now

@@ -176,6 +176,13 @@ Every output includes:
 - `git_commit`
 - `git_dirty`
 
+`formal_baseline_record` is stored as the repository-relative path
+`outputs/source/round2_baseline_selection.json`, not as a machine-local
+absolute path.
+
+The checked-in example payloads under `outputs/core/forward_interface/` are
+canonical clean-snapshot examples and should have `git_dirty = false`.
+
 Source-linked requests additionally include:
 
 - `source_sample_id`
