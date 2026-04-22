@@ -18,6 +18,15 @@ from core.simulation_model import SimulationModel
 from source.luo_loader import load_luo_samples
 from source.round2_projection import DEFAULT_ROUND2_PROJECTION_CONFIG, project_luo_sample_to_round2_channels
 
+from .directions import (
+    DirectionalSpread,
+    MAX_DIRECTIONAL_SPREAD_HALF_WIDTH,
+    direction_metadata_for_transport,
+    get_directional_mode,
+    spread_transport_samples,
+    validate_directional_spread,
+    validate_transport_direction,
+)
 from .schema import (
     FIT_LAYER_CONTROL_CHANNELS,
     FIT_LAYER_FREE_CHANNELS,
@@ -107,6 +116,7 @@ def forward_metadata(pairing_source: str, extra: dict[str, object] | None = None
 
 
 def _validate_transport(transport: TransportControls) -> None:
+    validate_transport_direction(transport)
     if transport.nk < 5:
         raise ValueError("transport.nk must be at least 5.")
     if transport.gamma <= 0:
@@ -183,6 +193,7 @@ def _compute_spectrum(
         conductance=[float(value) for value in np.asarray(result.conductance, dtype=np.float64)],
         conductance_unbroadened=[float(value) for value in np.asarray(result.conductance_unbroadened, dtype=np.float64)],
         transport_summary={
+            **direction_metadata_for_transport(transport),
             "interface_angle": float(result.interface_angle),
             "barrier_z": float(result.barrier_z),
             "gamma": float(result.broadening_gamma),
@@ -196,6 +207,117 @@ def _compute_spectrum(
             "mean_normal_transparency": float(result.mean_normal_transparency),
             "mean_mismatch_penalty": float(result.mean_mismatch_penalty),
             "approximation": result.approximation,
+        },
+    )
+
+
+def _directional_spread_payload(spread: DirectionalSpread) -> dict[str, object]:
+    mode = get_directional_mode(spread.direction_mode)
+    return {
+        **spread.to_dict(),
+        "central_interface_angle": float(mode.interface_angle),
+        "crystal_label": mode.crystal_label,
+        "support_tier": mode.support_tier,
+        "max_half_width": float(MAX_DIRECTIONAL_SPREAD_HALF_WIDTH),
+    }
+
+
+def _compute_directional_spread_spectrum(
+    channels: PhysicalPairingChannels,
+    transport: TransportControls,
+    bias: np.ndarray,
+    pairing_source: str,
+    request_kind: str,
+    request_payload: dict[str, object],
+    spread: DirectionalSpread,
+    extra_metadata: dict[str, object] | None = None,
+) -> ForwardSpectrumResult:
+    validate_directional_spread(spread)
+    if transport.direction_mode is not None and str(transport.direction_mode) != str(spread.direction_mode):
+        raise ValueError(
+            "Directional spread direction_mode must match TransportControls.direction_mode when both are provided: "
+            f"spread={spread.direction_mode!r}, transport={transport.direction_mode!r}."
+        )
+    spread_payload = _directional_spread_payload(spread)
+    sample_results: list[tuple[dict[str, float], ForwardSpectrumResult]] = []
+    for sample, sample_transport in spread_transport_samples(transport, spread):
+        result = _compute_spectrum(
+            channels=channels,
+            transport=sample_transport,
+            bias=bias,
+            pairing_source=pairing_source,
+            request_kind=request_kind,
+            request_payload=request_payload,
+            extra_metadata=extra_metadata,
+        )
+        sample_results.append((sample, result))
+
+    weights = np.asarray([sample["weight"] for sample, _ in sample_results], dtype=np.float64)
+    conductance = np.asarray(
+        sum(weight * np.asarray(result.conductance, dtype=np.float64) for weight, (_, result) in zip(weights, sample_results, strict=True)),
+        dtype=np.float64,
+    )
+    conductance_unbroadened = np.asarray(
+        sum(
+            weight * np.asarray(result.conductance_unbroadened, dtype=np.float64)
+            for weight, (_, result) in zip(weights, sample_results, strict=True)
+        ),
+        dtype=np.float64,
+    )
+    reference_result = sample_results[len(sample_results) // 2][1]
+    central_transport = replace(
+        transport,
+        direction_mode=str(spread.direction_mode),
+        interface_angle=float(spread_payload["central_interface_angle"]),
+    )
+    sample_summaries = [
+        {
+            "interface_angle": float(sample["interface_angle"]),
+            "relative_angle": float(sample["relative_angle"]),
+            "weight": float(sample["weight"]),
+            "num_channels": int(result.transport_summary["num_channels"]),
+            "num_input_channels": int(result.transport_summary["num_input_channels"]),
+            "num_filtered_channels": int(result.transport_summary["num_filtered_channels"]),
+            "num_same_band_channels": int(result.transport_summary["num_same_band_channels"]),
+            "mean_mismatch_penalty": float(result.transport_summary["mean_mismatch_penalty"]),
+        }
+        for sample, result in sample_results
+    ]
+    request_with_spread = dict(request_payload)
+    request_with_spread["directional_spread"] = spread_payload
+    metadata_extra = {
+        **(extra_metadata or {}),
+        "directional_spread": spread_payload,
+    }
+    return ForwardSpectrumResult(
+        schema_version=FORWARD_OUTPUT_SCHEMA_VERSION,
+        request_kind=request_kind,
+        request=request_with_spread,
+        metadata=forward_metadata(pairing_source=pairing_source, extra=metadata_extra),
+        pairing_channels=_channels_payload(channels),
+        bias_mev=list(reference_result.bias_mev),
+        conductance=[float(value) for value in conductance],
+        conductance_unbroadened=[float(value) for value in conductance_unbroadened],
+        transport_summary={
+            **direction_metadata_for_transport(central_transport),
+            "directional_spread": spread_payload,
+            "directional_spread_samples": sample_summaries,
+            "interface_angle": float(spread_payload["central_interface_angle"]),
+            "barrier_z": float(transport.barrier_z),
+            "gamma": float(transport.gamma),
+            "temperature_kelvin": float(transport.temperature_kelvin),
+            "nk": int(transport.nk),
+            "num_input_channels": int(round(float(np.average([item["num_input_channels"] for item in sample_summaries], weights=weights)))),
+            "num_channels": int(round(float(np.average([item["num_channels"] for item in sample_summaries], weights=weights)))),
+            "num_filtered_channels": int(round(float(np.average([item["num_filtered_channels"] for item in sample_summaries], weights=weights)))),
+            "num_same_band_channels": int(round(float(np.average([item["num_same_band_channels"] for item in sample_summaries], weights=weights)))),
+            "num_contours": reference_result.transport_summary["num_contours"],
+            "mean_normal_transparency": reference_result.transport_summary["mean_normal_transparency"],
+            "mean_mismatch_penalty": float(np.average([item["mean_mismatch_penalty"] for item in sample_summaries], weights=weights)),
+            "approximation": (
+                "Uniform symmetric narrow-angle average of existing 2D in-plane "
+                "forward spectra; not an experiment-side mixture fit."
+            ),
         },
     )
 
@@ -219,6 +341,29 @@ def generate_spectrum_from_fit_layer(request: FitLayerSpectrumRequest) -> Forwar
     )
 
 
+def generate_spread_spectrum_from_fit_layer(
+    request: FitLayerSpectrumRequest,
+    spread: DirectionalSpread,
+) -> ForwardSpectrumResult:
+    """Generate a narrow directional-spread averaged AR spectrum from fit controls."""
+
+    channels = _fit_layer_channels(request)
+    return _compute_directional_spread_spectrum(
+        channels=channels,
+        transport=request.transport,
+        bias=request.bias_grid.values(),
+        pairing_source="task_h_fit_layer_controls",
+        request_kind="fit_layer_directional_spread",
+        request_payload=request.to_dict(),
+        spread=spread,
+        extra_metadata={
+            "fit_layer_request_label": request.request_label,
+            "pairing_control_mode": request.pairing_control_mode,
+            "allow_weak_delta_zx_s": bool(request.allow_weak_delta_zx_s),
+        },
+    )
+
+
 def generate_spectrum_from_source_round2(request: SourceRound2SpectrumRequest) -> ForwardSpectrumResult:
     """Generate an AR spectrum from a Luo sample projected into round-2 channels."""
 
@@ -234,6 +379,35 @@ def generate_spectrum_from_source_round2(request: SourceRound2SpectrumRequest) -
         pairing_source="luo_source_default_round2_projection",
         request_kind="source_round2",
         request_payload=request_payload,
+        extra_metadata={
+            "source_sample_id": sample.sample_id,
+            "source_sample_kind": sample.sample_kind,
+            "source_coordinates": dict(sample.coordinates),
+            "round2_projection_metrics": dict(projected.round2_projection_metrics),
+            "round2_projection_metadata": dict(projected.round2_projection_metadata),
+        },
+    )
+
+
+def generate_spread_spectrum_from_source_round2(
+    request: SourceRound2SpectrumRequest,
+    spread: DirectionalSpread,
+) -> ForwardSpectrumResult:
+    """Generate a narrow directional-spread averaged AR spectrum from a Luo sample."""
+
+    sample = _find_luo_sample(request.source_sample_id, request.source_sample_index)
+    projected = project_luo_sample_to_round2_channels(sample)
+    assert projected.projected_physical_channels is not None
+    request_payload = request.to_dict()
+    request_payload["resolved_source_sample_id"] = sample.sample_id
+    return _compute_directional_spread_spectrum(
+        channels=projected.projected_physical_channels,
+        transport=request.transport,
+        bias=request.bias_grid.values(),
+        pairing_source="luo_source_default_round2_projection",
+        request_kind="source_round2_directional_spread",
+        request_payload=request_payload,
+        spread=spread,
         extra_metadata={
             "source_sample_id": sample.sample_id,
             "source_sample_kind": sample.sample_kind,

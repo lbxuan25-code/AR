@@ -8,6 +8,7 @@
     "source_sample_id": null,
     "source_sample_index": 0,
     "transport": {
+      "direction_mode": null,
       "interface_angle": 0.0,
       "barrier_z": 0.5,
       "gamma": 1.0,
@@ -109,7 +110,7 @@
         "im": 0.0
       }
     },
-    "git_commit": "051ac208f6fe124adbe0619592007cee7882697d",
+    "git_commit": "4e4c935d1f123c03ee2250f8624d5df3c2c7ebe3",
     "git_dirty": false,
     "source_sample_id": "pams_J0.09_0.18_0_0_0_0_complex_Nm220_-0.3372_0.3_-0.1646_0.3_121_93::0_0",
     "source_sample_kind": "two-parameter px/pz RMFT phase-space scan",
@@ -497,6 +498,11 @@
     0.9799622495463663
   ],
   "transport_summary": {
+    "direction_mode": null,
+    "direction_support_tier": "raw_2d_inplane_angle",
+    "direction_crystal_label": null,
+    "direction_dimensionality": "2D in-plane raw angle",
+    "direction_is_named_mode": false,
     "interface_angle": 0.0,
     "barrier_z": 0.5,
     "gamma": 1.0,

@@ -18,11 +18,15 @@ Programmatic imports:
 ```python
 from forward import (
     BiasGrid,
+    DirectionalSpread,
     FitLayerSpectrumRequest,
     SourceRound2SpectrumRequest,
     TransportControls,
     generate_spectrum_from_fit_layer,
     generate_spectrum_from_source_round2,
+    generate_spread_spectrum_from_fit_layer,
+    generate_spread_spectrum_from_source_round2,
+    transport_with_direction_mode,
 )
 ```
 
@@ -53,6 +57,9 @@ The generated examples are:
 
 - `outputs/core/forward_interface/fit_layer_example_spectrum.json`
 - `outputs/core/forward_interface/source_round2_example_spectrum.json`
+- `outputs/core/forward_interface/fit_layer_inplane_110_example_spectrum.json`
+- `outputs/core/forward_interface/fit_layer_inplane_110_spread_example_spectrum.json`
+- `outputs/core/forward_interface/directional_capability_index.json`
 
 ## Interface Version Tags
 
@@ -118,11 +125,92 @@ generating the AR spectrum.
 
 | Field | Meaning |
 | --- | --- |
-| `interface_angle` | Interface orientation angle in radians |
+| `direction_mode` | Optional named in-plane high-symmetry mode provenance |
+| `interface_angle` | 2D in-plane interface-normal angle in radians |
 | `barrier_z` | BTK barrier strength |
 | `gamma` | Broadening in meV |
 | `temperature_kelvin` | Temperature in Kelvin |
 | `nk` | Momentum-grid resolution used by the interface diagnostics |
+
+Direction convention:
+
+- `interface_angle` is not a general 3D experimental crystal-direction selector.
+- It is the polar angle of the interface normal in the current model's 2D
+  `kx-ky` plane, with normal vector `(cos(angle), sin(angle))`.
+- In-plane `100` is currently valid only as shorthand for raw
+  `interface_angle = 0` or symmetry-equivalent `pi/2`.
+- In-plane `110` is currently valid only as shorthand for raw
+  `interface_angle = pi/4`.
+- True `c-axis` transport is not implemented in the current forward model.
+
+See `docs/direction_capability_task_l.md` for the Task-L audit and support
+tiers.
+See `docs/c_axis_direction_task_o.md` for the formal Task-O c-axis unsupported
+decision and required extension plan.
+
+Task M adds named helpers for the Tier-A high-symmetry in-plane modes:
+
+| Direction mode | Raw `interface_angle` | Meaning |
+| --- | ---: | --- |
+| `inplane_100` | `0` | 2D in-plane `[100]` interface normal |
+| `inplane_110` | `pi/4` | 2D in-plane `[110]` interface normal |
+
+Programmatic callers should prefer:
+
+```python
+transport = transport_with_direction_mode("inplane_110", nk=41)
+```
+
+The forward engine validates that `direction_mode` and `interface_angle` are
+consistent. Named-mode outputs record both the mode label and the raw angle in
+the serialized request and `transport_summary`.
+
+The CLI equivalent is:
+
+```bash
+PYTHONPATH=src python scripts/core/generate_forward_spectrum.py fit-layer \
+  --direction-mode inplane_110 \
+  --output-json outputs/core/forward_interface/example_inplane_110.json
+```
+
+Task N validates generic non-high-symmetry raw angles. The current support
+boundary is conservative: generic raw `interface_angle` values are computable,
+but they are diagnostic / caution-required unless their scan metrics satisfy
+the robust thresholds in `docs/inplane_generic_direction_validation_task_n.md`.
+External training repositories should not treat arbitrary continuous in-plane
+angles as broadly supported truth modes.
+
+Task O formally forbids c-axis labeling in the current public interface.
+`direction_mode="c_axis"` and common c-axis aliases are rejected because the
+current model has no `kz`, no out-of-plane velocity, and no c-axis reflected
+state construction. A raw 2D `interface_angle` output must never be relabeled as
+c-axis transport.
+
+Task P adds narrow spread helpers for supported in-plane modes:
+
+```python
+from forward import DirectionalSpread, generate_spread_spectrum_from_fit_layer
+
+spread = DirectionalSpread(
+    direction_mode="inplane_110",
+    half_width=3.141592653589793 / 64.0,
+    num_samples=5,
+)
+result = generate_spread_spectrum_from_fit_layer(request, spread)
+```
+
+The spread rule is a uniform symmetric average over raw-angle spectra around
+the central named mode. The current half-width contract is narrow,
+`half_width <= pi/32`, and spread outputs record the spread settings plus each
+sample angle and weight. This is a forward approximation only, not an
+experiment-side fitted directional mixture.
+
+Task Q consolidates Tasks L-P into the final external directional contract for
+the current interface. External repositories should use
+`docs/directional_capability_contract_task_q.md` plus the compact
+machine-readable index
+`outputs/core/forward_interface/directional_capability_index.json` when deciding
+which direction requests are safe to generate.
 
 `BiasGrid` fields:
 
@@ -176,6 +264,22 @@ Every output includes:
 - `git_commit`
 - `git_dirty`
 
+Direction provenance is serialized in every output under `request.transport`
+and `transport_summary`:
+
+- `direction_mode`
+- `interface_angle`
+- `direction_support_tier`
+- `direction_crystal_label`
+- `direction_dimensionality`
+
+Directional-spread outputs additionally include:
+
+- `request.directional_spread`
+- `metadata.directional_spread`
+- `transport_summary.directional_spread`
+- `transport_summary.directional_spread_samples`
+
 `formal_baseline_record` is stored as the repository-relative path
 `outputs/source/round2_baseline_selection.json`, not as a machine-local
 absolute path.
@@ -223,6 +327,8 @@ generate spectra from:
 
 - Task-H fit-layer controls;
 - Luo source samples projected into round-2 channels.
+- supported named in-plane directions and narrow directional spreads described
+  by `docs/directional_capability_contract_task_q.md`.
 
 It can record stable schema and convention metadata without copying the
 normal-state, projection, pairing, interface, or BTK implementation.

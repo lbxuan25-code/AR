@@ -14,11 +14,16 @@ if str(SRC_DIR) not in sys.path:
 
 from forward import (
     BiasGrid,
+    DirectionalSpread,
     FitLayerSpectrumRequest,
     SourceRound2SpectrumRequest,
     TransportControls,
     generate_spectrum_from_fit_layer,
     generate_spectrum_from_source_round2,
+    generate_spread_spectrum_from_fit_layer,
+    generate_spread_spectrum_from_source_round2,
+    list_directional_modes,
+    replace_direction_mode,
 )
 
 
@@ -33,6 +38,25 @@ def _parse_control(item: str) -> tuple[str, float]:
 
 
 def _add_common_args(parser: argparse.ArgumentParser) -> None:
+    direction_choices = tuple(mode.name for mode in list_directional_modes())
+    parser.add_argument(
+        "--direction-mode",
+        choices=direction_choices,
+        default=None,
+        help="Optional named in-plane high-symmetry mode. Overrides --interface-angle when provided.",
+    )
+    parser.add_argument(
+        "--spread-half-width",
+        type=float,
+        default=0.0,
+        help="Optional narrow directional-spread half width in radians. Requires --direction-mode when nonzero.",
+    )
+    parser.add_argument(
+        "--spread-num-samples",
+        type=int,
+        default=5,
+        help="Odd number of uniformly weighted samples for a nonzero directional spread.",
+    )
     parser.add_argument("--interface-angle", type=float, default=0.0)
     parser.add_argument("--barrier-z", type=float, default=0.5)
     parser.add_argument("--gamma", type=float, default=1.0)
@@ -78,13 +102,16 @@ def parse_args() -> argparse.Namespace:
 
 
 def _transport_from_args(args: argparse.Namespace) -> TransportControls:
-    return TransportControls(
+    transport = TransportControls(
         interface_angle=float(args.interface_angle),
         barrier_z=float(args.barrier_z),
         gamma=float(args.gamma),
         temperature_kelvin=float(args.temperature),
         nk=int(args.nk),
     )
+    if args.direction_mode is not None:
+        transport = replace_direction_mode(transport, args.direction_mode)
+    return transport
 
 
 def _bias_grid_from_args(args: argparse.Namespace) -> BiasGrid:
@@ -100,6 +127,18 @@ def main() -> None:
     transport = _transport_from_args(args)
     bias_grid = _bias_grid_from_args(args)
     label = args.label or args.mode
+    spread = None
+    spread_half_width = float(args.spread_half_width)
+    if spread_half_width < 0.0:
+        raise SystemExit("--spread-half-width must be non-negative.")
+    if spread_half_width > 0.0:
+        if args.direction_mode is None:
+            raise SystemExit("--spread-half-width requires --direction-mode so the spread has a named central mode.")
+        spread = DirectionalSpread(
+            direction_mode=str(args.direction_mode),
+            half_width=spread_half_width,
+            num_samples=int(args.spread_num_samples),
+        )
     if args.mode == "fit-layer":
         request = FitLayerSpectrumRequest(
             pairing_controls=dict(args.control),
@@ -109,7 +148,10 @@ def main() -> None:
             bias_grid=bias_grid,
             request_label=label,
         )
-        result = generate_spectrum_from_fit_layer(request)
+        if spread is None:
+            result = generate_spectrum_from_fit_layer(request)
+        else:
+            result = generate_spread_spectrum_from_fit_layer(request, spread)
     else:
         request = SourceRound2SpectrumRequest(
             source_sample_id=args.sample_id,
@@ -118,7 +160,10 @@ def main() -> None:
             bias_grid=bias_grid,
             request_label=label,
         )
-        result = generate_spectrum_from_source_round2(request)
+        if spread is None:
+            result = generate_spectrum_from_source_round2(request)
+        else:
+            result = generate_spread_spectrum_from_source_round2(request, spread)
 
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(result.to_dict(), indent=2), encoding="utf-8")

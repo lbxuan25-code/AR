@@ -1,0 +1,69 @@
+{
+  "contract_id": "directional_capability_task_q_v1",
+  "forward_interface_version": "ar_forward_v1",
+  "angle_convention": {
+    "interface_angle": "2D in-plane interface-normal angle in radians",
+    "normal_vector": "(cos(interface_angle), sin(interface_angle))",
+    "not_a_3d_crystal_direction_selector": true
+  },
+  "supported_named_modes": {
+    "inplane_100": {
+      "support_tier": "A",
+      "crystal_label": "100",
+      "interface_angle": 0.0,
+      "status": "supported_high_symmetry_inplane_mode"
+    },
+    "inplane_110": {
+      "support_tier": "A",
+      "crystal_label": "110",
+      "interface_angle": 0.7853981633974483,
+      "status": "supported_high_symmetry_inplane_mode"
+    }
+  },
+  "generic_raw_inplane_angles": {
+    "status": "diagnostic_caution_only",
+    "support_tier": "raw_2d_inplane_angle",
+    "external_truth_mode": false,
+    "example_payload": null,
+    "reference": "docs/inplane_generic_direction_validation_task_n.md"
+  },
+  "c_axis": {
+    "status": "unsupported",
+    "external_truth_mode": false,
+    "example_payload": null,
+    "reference": "docs/c_axis_direction_task_o.md"
+  },
+  "directional_spread": {
+    "status": "supported_for_named_inplane_modes_only",
+    "averaging_rule": "uniform_symmetric",
+    "max_half_width": 0.09817477042468103,
+    "num_samples_rule": "odd integer; nonzero width requires at least 3 samples",
+    "example_payload": "outputs/core/forward_interface/fit_layer_inplane_110_spread_example_spectrum.json",
+    "reference": "docs/directional_spread_task_p.md"
+  },
+  "canonical_example_payloads": {
+    "raw_fit_layer": "outputs/core/forward_interface/fit_layer_example_spectrum.json",
+    "raw_source_round2": "outputs/core/forward_interface/source_round2_example_spectrum.json",
+    "named_high_symmetry_inplane": "outputs/core/forward_interface/fit_layer_inplane_110_example_spectrum.json",
+    "spread_enabled": "outputs/core/forward_interface/fit_layer_inplane_110_spread_example_spectrum.json"
+  },
+  "required_output_provenance_fields": {
+    "request.transport": [
+      "direction_mode",
+      "interface_angle"
+    ],
+    "transport_summary": [
+      "direction_mode",
+      "direction_support_tier",
+      "direction_crystal_label",
+      "direction_dimensionality",
+      "interface_angle"
+    ],
+    "directional_spread_outputs": [
+      "request.directional_spread",
+      "metadata.directional_spread",
+      "transport_summary.directional_spread",
+      "transport_summary.directional_spread_samples"
+    ]
+  }
+}

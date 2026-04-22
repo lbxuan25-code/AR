@@ -99,12 +99,104 @@ Files:
 
 - `fit_layer_example_spectrum.json`
 - `source_round2_example_spectrum.json`
+- `fit_layer_inplane_110_example_spectrum.json`
+- `fit_layer_inplane_110_spread_example_spectrum.json`
+- `directional_capability_index.json`
 
 Role:
 
 - tiny examples for the Task-I stable forward interface;
 - demonstrate canonical schema and metadata for external training repositories;
+- publish the Task-Q directional capability contract in checked-in example
+  payload form;
 - should stay small and reproducible.
+
+### Direction Capability Audit
+
+`outputs/core/direction_capability_audit/`
+
+Files:
+
+- `direction_capability_summary.json`
+- `direction_capability_metrics.csv`
+- `direction_capability_representative_plots.png`
+
+Role:
+
+- Task-L audit of the current directional semantics;
+- documents that `interface_angle` is a 2D in-plane interface-normal angle;
+- separates supported in-plane high-symmetry shorthand from unsupported
+  `c-axis` language.
+
+### Directional Modes Validation
+
+`outputs/core/directional_modes_validation/`
+
+Files:
+
+- `directional_modes_summary.json`
+- `directional_modes_metrics.csv`
+- `directional_modes_comparison.png`
+
+Role:
+
+- Task-M validation of callable high-symmetry in-plane directional modes;
+- verifies `inplane_100` and `inplane_110` reproduce their raw-angle forward
+  calls;
+- confirms outputs record both `direction_mode` and `interface_angle`.
+
+### Generic In-Plane Direction Scan
+
+`outputs/core/inplane_direction_scan/`
+
+Files:
+
+- `summary.json`
+- `metrics.csv`
+- `inplane_direction_scan_plots.png`
+
+Role:
+
+- Task-N dense scan over `[0, pi/2]` raw in-plane angles;
+- classifies generic non-high-symmetry angles as robust, caution, or unstable
+  using quantitative thresholds;
+- documents that generic raw in-plane angles are diagnostic / caution-required
+  rather than broadly promoted truth modes.
+
+### C-Axis Direction Audit
+
+`outputs/core/c_axis_direction_audit/`
+
+Files:
+
+- `summary.json`
+- `capability_matrix.csv`
+
+Role:
+
+- Task-O audit of whether true c-axis transport is physically implemented;
+- records the blocking gaps: no `kz`, no out-of-plane velocity, no 3D/c-axis
+  Fermi-surface construction, and no c-axis reflected-state path;
+- documents that c-axis is formally unsupported and cannot be emulated by a
+  raw 2D in-plane `interface_angle`.
+
+### Directional Spread Validation
+
+`outputs/core/directional_spread_validation/`
+
+Files:
+
+- `directional_spread_summary.json`
+- `directional_spread_metrics.csv`
+- `directional_spread_validation.png`
+
+Role:
+
+- Task-P validation of narrow spread-averaged spectra around supported in-plane
+  named modes;
+- verifies smooth spectral evolution as half width increases over
+  `0`, `pi/128`, `pi/64`, and `pi/32`;
+- documents the current uniform symmetric averaging rule and safe-use boundary.
 
 ### Required Local Luo Source Cache
 
@@ -151,7 +243,12 @@ current output narrative.
 ```text
 outputs/
   core/
+    c_axis_direction_audit/
+    direction_capability_audit/
+    directional_modes_validation/
+    directional_spread_validation/
     forward_interface/
+    inplane_direction_scan/
     rmft_source_vs_round2_ar_validation/
     round2_baseline_spectral_validation/
   source/

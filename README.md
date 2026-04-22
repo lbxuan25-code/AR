@@ -46,6 +46,41 @@ repository in `docs/forward_interface_task_i.md`. External callers should use
 the `forward` package or `scripts/core/generate_forward_spectrum.py` rather than
 copying internal normal-state, projection, pairing, interface, or BTK code.
 
+Task L defines the current directional capability contract in
+`docs/direction_capability_task_l.md`. In the current forward model,
+`interface_angle` is strictly a 2D in-plane interface-normal angle. In-plane
+`100` and `110` are supported only as high-symmetry raw-angle shorthand, while
+true `c-axis` transport is not yet physically implemented.
+
+Task M promotes those high-symmetry in-plane directions into callable forward
+modes, documented in `docs/directional_modes_task_m.md`. External callers may
+request `inplane_100` or `inplane_110` through the `forward` directional helpers
+without manually supplying raw angles.
+
+Task N validates generic non-high-symmetry in-plane raw angles in
+`docs/inplane_generic_direction_validation_task_n.md`. The current result is
+that generic raw angles remain diagnostic / caution-required rather than
+broadly promoted truth modes.
+
+Task O formally walls off c-axis transport in `docs/c_axis_direction_task_o.md`.
+The current truth chain has no `kz`, out-of-plane velocity, or c-axis reflected
+state construction, so c-axis must not be emulated with a 2D in-plane
+`interface_angle`.
+
+Task P adds a narrow directional-spread primitive in
+`docs/directional_spread_task_p.md`. The current supported spread is a uniform
+symmetric average around `inplane_100` or `inplane_110` within a half width no
+larger than `pi/32`; it is a forward approximation, not an experiment-side
+mixture fit.
+
+Task Q publishes the final external directional capability contract for the
+current forward interface in `docs/directional_capability_contract_task_q.md`
+and `outputs/core/forward_interface/directional_capability_index.json`.
+External repositories should treat those files as the compact direction
+contract: named `inplane_100` / `inplane_110` modes are supported, generic raw
+in-plane angles are diagnostic / caution-only, c-axis is unsupported, and
+narrow spread is supported only around named in-plane modes.
+
 The compact index of currently decision-relevant generated outputs is
 `docs/current_output_index_task_k.md`.
 

@@ -3,103 +3,160 @@
 ## Current Task
 
 ### No active task — awaiting next assignment
-All tasks currently listed in this file have been completed and verified.
+
+All tasks currently listed in this TODO have been completed and archived.
 
 ---
 
 ## Backlog
 
+---
+
 ## Archive
 
-### Task K — Reduce historical outputs and keep only decision-relevant diagnostics
+### Task Q — Publish the complete directional capability contract for external repositories
 
 Completed and verified.
 
-- Added `docs/current_output_index_task_k.md` as the compact index of current
-  decision-relevant generated outputs.
-- Added `docs/workspace_cleanup_task_k.md` as the cleanup summary.
-- Removed stale generated AR-aware projection comparison outputs from
-  `outputs/source/`.
-- Removed the superseded baseline-forward demo output directory from
-  `outputs/core/`.
-- Kept current outputs for authoritative baseline provenance,
-  source-to-round2 fidelity, residual anatomy, RMFT-source-reference AR
-  validation, formal round-2 baseline spectral validation, forward-interface
-  examples, and the required Luo source cache.
-- Removed Python bytecode caches after testing.
+- Added `docs/directional_capability_contract_task_q.md` as the single external
+  direction capability contract for the current forward interface.
+- Added `outputs/core/forward_interface/directional_capability_index.json` as a
+  compact machine-readable reference for external callers.
+- Updated `docs/forward_interface_task_i.md`, `docs/current_output_index_task_k.md`,
+  and `README.md` to point to the Task-Q contract.
+- Extended `scripts/core/generate_forward_spectrum.py` so the stable CLI can
+  generate narrow directional-spread spectra through the public forward
+  helpers.
+- Refreshed raw forward-interface examples and added checked-in examples for
+  `inplane_110` and `inplane_110` directional spread.
+- Confirmed the stable external boundary: named `inplane_100` / `inplane_110`
+  modes are supported, generic raw in-plane angles remain diagnostic /
+  caution-only, c-axis is unsupported, and spread is supported only around
+  named in-plane modes.
+- Added `tests/forward/test_directional_capability_contract_examples.py` to
+  lock the contract index and example payload provenance.
+- Verified with
+  `PYTHONPATH=src pytest tests/forward/test_directional_capability_contract_examples.py tests/forward/test_directional_spread_smoke.py tests/forward/test_directional_modes_smoke.py tests/forward/test_forward_interface_smoke.py -q`.
 - Verified with `PYTHONPATH=src pytest tests -q`.
 
-### Task J — Create the new surrogate / inverse repository plan
+### Task P — Add directional spread primitives to the forward truth chain
 
 Completed and verified.
 
-- Added `docs/new_surrogate_inverse_repository_plan.md`.
-- Added future-repository starter templates under
-  `docs/new_surrogate_inverse_repository/`:
-  `AGENTS.md`, `TODO.md`, and `DIRECTORY_PLAN.md`.
-- Defined the repository split:
-  current repository = forward truth chain;
-  future repository = dataset orchestration, surrogate training, inverse search,
-  and experiment fitting.
-- Defined the dependency strategy: the future repository consumes this
-  repository through the stable `forward` package or
-  `scripts/core/generate_forward_spectrum.py` and must not copy forward physics
-  internals.
-- Specified the initial new-repository task sequence and directory ownership
-  plan.
-- Preserved this repository's root `README.md`, `AGENTS.md`, and template-free
-  root files; only this `TODO.md` was minimally updated for task promotion.
+- Added `DirectionalSpread`, spread sampling helpers, and spread validation to
+  `src/forward/directions.py`.
+- Added `generate_spread_spectrum_from_fit_layer(...)` and
+  `generate_spread_spectrum_from_source_round2(...)` to the stable `forward`
+  engine.
+- Exported the spread helpers through the public `forward` package.
+- Defined the current spread primitive as a uniform symmetric average around
+  supported named in-plane modes with maximum half width `pi/32`.
+- Added `src/core/directional_spread_validation.py` and
+  `scripts/core/validate_directional_spread.py`.
+- Generated `outputs/core/directional_spread_validation/` with summary,
+  metrics CSV, and validation plot.
+- Validated spread evolution across `inplane_100`, `inplane_110`, half widths
+  `0`, `pi/128`, `pi/64`, `pi/32`, barriers `0.5` / `1.0`, and two pairing
+  states.
+- Found smooth width evolution with max observed width-step spectrum difference
+  `0.20857708180230394` below the `0.25` threshold.
+- Added `docs/directional_spread_task_p.md` and updated README / forward
+  interface / current output index docs.
+- Added `tests/forward/test_directional_spread_smoke.py` and
+  `tests/core/test_directional_spread_validation_smoke.py`.
 - Verified with `PYTHONPATH=src pytest tests -q`.
 
-### Task I — Prepare the forward repository to serve an external training repository
+### Task O — Decide and implement the true c-axis directional path (or explicitly wall it off)
 
 Completed and verified.
 
-- Added stable public package `forward` with canonical schemas and callable
-  spectrum-generation entry points.
-- Added `FitLayerSpectrumRequest` and
-  `generate_spectrum_from_fit_layer(...)` for Task-H fit-layer controls.
-- Added `SourceRound2SpectrumRequest` and
-  `generate_spectrum_from_source_round2(...)` for Luo samples projected through
-  the default round-2 truth layer.
-- Added CLI entry point `scripts/core/generate_forward_spectrum.py`.
-- Added version tags and canonical metadata fields:
-  `ar_forward_v1`, `ar_forward_input_v1`, `ar_forward_output_v1`, and
-  `round2_physical_channels_task_h_fit_layer_v1`.
-- Generated example payloads under `outputs/core/forward_interface/`.
-- Added `docs/forward_interface_task_i.md` and updated README / Task-H docs.
+- Added `src/core/c_axis_direction_audit.py` and
+  `scripts/core/audit_c_axis_direction.py`.
+- Generated `outputs/core/c_axis_direction_audit/` with an unsupported summary
+  and capability matrix.
+- Added `docs/c_axis_direction_task_o.md`.
+- Audited the current normal-state, pairing, BdG, simulation model,
+  Fermi-surface, interface-normal, and velocity paths.
+- Found blocking gaps for true c-axis transport: no `kz`, no out-of-plane
+  velocity, no 3D/c-axis Fermi-surface construction, and no c-axis
+  reflected-state path.
+- Formally marked c-axis as unsupported in the current forward truth chain.
+- Updated `forward.directions` so `c_axis` / `c-axis` aliases raise a specific
+  unsupported error rather than being silently mapped to any raw in-plane angle.
+- Updated `README.md`, `docs/forward_interface_task_i.md`,
+  `docs/current_output_index_task_k.md`, and prior direction docs.
+- Added `tests/core/test_c_axis_direction_audit_smoke.py`.
 - Verified with `PYTHONPATH=src pytest tests -q`.
 
-### Task H — Define the fit-layer parameterization for AR inversion
+### Task N — Validate non-high-symmetry in-plane directions and define their support boundary
 
 Completed and verified.
 
-- Added `docs/fit_layer_parameterization_task_h.md`.
-- Defined the truth layer as the full current round-2 `PhysicalPairingChannels`
-  forward representation with the authoritative formal baseline.
-- Defined the fit layer as a lower-dimensional, gauge-fixed, regularized AR
-  inversion control layer around the formal baseline.
-- Added a parameter table separating free, strongly regularized,
-  fixed-by-default weak, fixed, nuisance, and derived fields.
-- Specified the inversion output contract as ranked candidate families with
-  uncertainty ranges, not a unique microscopic RMFT point.
-- Updated `README.md`, `docs/pairing_state_stage3.md`,
-  `docs/order_parameter_refactor_round2.md`, and
-  `docs/rmft_source_vs_round2_ar_validation.md`.
+- Added `src/core/inplane_direction_scan.py` and
+  `scripts/core/validate_inplane_directions.py`.
+- Generated `outputs/core/inplane_direction_scan/` with dense scan summary,
+  metrics CSV, and angular smoothness / matching plots.
+- Added `docs/inplane_generic_direction_validation_task_n.md`.
+- Scanned 33 raw 2D in-plane angles over `[0, pi/2]`.
+- Measured nominal/tight/loose reflected-state matching, same-band retention,
+  reflected mismatch statistics, tolerance sensitivity, and nearest-neighbor
+  spectral smoothness.
+- Defined explicit robust / caution / unstable thresholds.
+- Found that the 3 high-symmetry checkpoints are robust, while the 30 generic
+  non-high-symmetry angles contain 0 robust, 20 caution, and 10 unstable cases.
+- Concluded that generic raw in-plane angles remain diagnostic /
+  caution-required rather than broadly promoted truth modes.
+- Updated `README.md`, `docs/forward_interface_task_i.md`, and
+  `docs/current_output_index_task_k.md`.
+- Added `tests/core/test_inplane_direction_scan_smoke.py`.
 - Verified with `PYTHONPATH=src pytest tests -q`.
 
-### Task G — Rebuild the validation axis around RMFT-source-to-AR fidelity
+### Task M — Build canonical directional forward modes for in-plane high-symmetry transport
 
 Completed and verified.
 
-- Added a direct RMFT source-reference AR comparison path against round-2 projected-channel AR spectra.
-- Generated representative best / median / worst sample comparisons over interface angle, barrier strength, broadening, and temperature.
-- Wrote current outputs under `outputs/core/rmft_source_vs_round2_ar_validation/`.
-- Added `docs/rmft_source_vs_round2_ar_validation.md` and updated current docs so the main validation story is no longer round-1-centered.
-- Removed the standalone round-1-vs-round-2 comparison script and generated JSON artifact from the current validation target set while retaining minimal compatibility checks in code/tests.
+- Added `src/forward/directions.py` with canonical `inplane_100` and
+  `inplane_110` directional modes.
+- Exported directional helpers through the stable `forward` package:
+  `list_directional_modes()`, `interface_angle_for_direction_mode()`,
+  `transport_with_direction_mode()`, and `replace_direction_mode()`.
+- Updated `TransportControls` to record optional `direction_mode` provenance
+  alongside raw `interface_angle`.
+- Added forward-engine validation so inconsistent `direction_mode` /
+  `interface_angle` combinations raise `ValueError`.
+- Updated `scripts/core/generate_forward_spectrum.py` with
+  `--direction-mode`.
+- Added `src/core/directional_modes_validation.py` and
+  `scripts/core/validate_directional_modes.py`.
+- Generated `outputs/core/directional_modes_validation/` with summary, metrics,
+  and raw-vs-named comparison plots.
+- Added `docs/directional_modes_task_m.md` and updated README / forward
+  interface / current output index docs.
+- Refreshed forward-interface example outputs so transport provenance includes
+  `direction_mode`.
+- Added `tests/forward/test_directional_modes_smoke.py` and updated existing
+  forward-interface smoke assertions.
 - Verified with `PYTHONPATH=src pytest tests -q`.
 
-### Completed previously
+### Task L — Audit and standardize directional semantics in the forward truth chain
+
+Completed and verified.
+
+- Added `src/core/direction_capability_audit.py` and
+  `scripts/core/audit_direction_capability.py`.
+- Generated `outputs/core/direction_capability_audit/` with JSON summary, CSV
+  metrics, and representative spectra / matching plots.
+- Added `docs/direction_capability_task_l.md`.
+- Defined `interface_angle` as a strictly 2D in-plane interface-normal angle.
+- Classified in-plane `100` and `110` as supported high-symmetry raw-angle
+  shorthand, generic in-plane angles as computable but caution-required, and
+  `c-axis` as unsupported in the current model.
+- Updated `README.md`, `docs/forward_interface_task_i.md`,
+  `docs/current_output_index_task_k.md`, and the public forward schema docstring.
+- Added `tests/core/test_direction_capability_audit_smoke.py`.
+- Verified with `PYTHONPATH=src pytest tests -q`.
+
+### Completed and verified previously
 - Stage_1 — Independent forward-physics repository
 - Stage_2 — Luo / RMFT source bridge and round-1 audit
 - Stage_3 — Round-2 order-parameter truth-layer refactor
@@ -109,14 +166,20 @@ Completed and verified.
 - Task D — Spectral validation of the formal round-2 baseline
 - Task E — Documentation sync for Stage-3 implementation
 - Task F — Workspace cleanup / decontamination
+- Task G — Rebuild the validation axis around RMFT-source-to-AR fidelity
+- Task H — Define the fit-layer parameterization for AR inversion
+- Task I — Prepare the forward repository to serve an external training repository
+- Task J — Create the new surrogate / inverse repository plan
+- Task K — Reduce historical outputs and keep only decision-relevant diagnostics
 
-#### Current repository status after those completed tasks
+#### Current repository status before the new directionality cycle
 - one authoritative round-2 forward truth path
 - one authoritative formal baseline source
-- cleaned workspace
-- RMFT-source-reference vs round-2 AR validation is now the main validation axis
-- AR inversion fit-layer parameterization is documented
-- stable forward interface is documented and callable
-- separate surrogate / inverse repository plan is documented
-- compact current output index is documented
-- no pending tasks remain in this TODO
+- stable external `forward` interface
+- RMFT-source-reference vs round-2 AR validation established
+- fit-layer parameterization documented
+- external training / inverse repository already separated
+- no active task before beginning the directionality cycle
+
+#### Directionality-cycle objective
+Build a complete, explicit, externally consumable directional forward capability, starting from semantic audit and ending in a stable direction contract for downstream repositories.

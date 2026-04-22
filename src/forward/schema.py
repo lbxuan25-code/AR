@@ -50,8 +50,15 @@ class BiasGrid:
 
 @dataclass(frozen=True, slots=True)
 class TransportControls:
-    """Transport controls consumed by the multichannel BTK forward path."""
+    """Transport controls consumed by the multichannel BTK forward path.
 
+    ``interface_angle`` is the 2D in-plane interface-normal angle in radians,
+    not a general 3D crystal-direction selector. ``direction_mode`` is optional
+    provenance for canonical named in-plane modes such as ``inplane_100`` and
+    ``inplane_110``.
+    """
+
+    direction_mode: str | None = None
     interface_angle: float = 0.0
     barrier_z: float = 0.5
     gamma: float = 1.0

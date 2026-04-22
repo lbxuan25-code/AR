@@ -37,6 +37,9 @@ def test_fit_layer_forward_interface_smoke() -> None:
     assert payload["metadata"]["pairing_convention_id"] == "round2_physical_channels_task_h_fit_layer_v1"
     assert payload["metadata"]["formal_baseline_record"] == "outputs/source/round2_baseline_selection.json"
     assert payload["pairing_channels"]["delta_zx_s"] == {"re": 0.0, "im": 0.0}
+    assert payload["request"]["transport"]["direction_mode"] is None
+    assert payload["transport_summary"]["direction_mode"] is None
+    assert payload["transport_summary"]["direction_support_tier"] == "raw_2d_inplane_angle"
     assert len(payload["bias_mev"]) == 41
     assert len(payload["conductance"]) == 41
     assert np.all(np.isfinite(payload["conductance"]))
@@ -70,6 +73,8 @@ def test_source_round2_forward_interface_smoke() -> None:
     assert payload["metadata"]["pairing_source"] == "luo_source_default_round2_projection"
     assert payload["metadata"]["source_sample_id"]
     assert payload["metadata"]["round2_projection_metrics"]["retained_ratio_total"] > 0.0
+    assert payload["request"]["transport"]["direction_mode"] is None
+    assert payload["transport_summary"]["direction_mode"] is None
     assert len(payload["bias_mev"]) == 41
     assert len(payload["conductance"]) == 41
     assert np.all(np.isfinite(payload["conductance"]))

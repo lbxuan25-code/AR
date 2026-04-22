@@ -1,0 +1,9 @@
+component,required_for_c_axis,current_evidence,current_status,blocking
+normal_state.h0_matrix,Hamiltonian depends on out-of-plane momentum or a physically equivalent c-axis coordinate.,"signature=['kx', 'ky', 'params']",missing_kz,True
+pairing.delta_matrix,Pairing tensor can be evaluated on c-axis-injected states.,"signature=['kx', 'ky', 'params']",missing_kz,True
+bdg.bdg_matrix,BdG Hamiltonian supports the same out-of-plane momentum structure.,"signature=['kx', 'ky', 'params']",missing_kz,True
+simulation_model.SimulationModel,Public model methods accept a c-axis coordinate or true 3D momentum.,"build_normal_state=['self', 'kx', 'ky'], build_delta=['self', 'kx', 'ky']",2d_kx_ky_only,True
+bands.normal_state_eigensystem_on_kgrid,Fermi-surface extraction supports a 3D surface or c-axis injection manifold.,"signature=['params', 'nk']",2d_square_grid_only,True
+interface_geometry.interface_normal,"Interface normal can represent out-of-plane injection, e.g. a 3-vector along z.","returns (cos(angle), sin(angle)) in the kx-ky plane",2d_inplane_normal_only,True
+interface_geometry.estimate_group_velocity,Velocity matching includes an out-of-plane velocity component.,finite differences only in kx and ky; returns a 2-component velocity,missing_vz,True
+forward.directions,Public direction registry exposes c-axis only after a validated c-axis path exists.,canonical modes are limited to inplane_100 and inplane_110,c_axis_intentionally_absent,False
